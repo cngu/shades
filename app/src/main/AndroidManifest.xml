@@ -9,8 +9,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ShadesActivity"
-            android:label="@string/app_name"
-            android:theme="@style/ShadesActivityTheme" >
+            android:label="@string/shades_settings" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,6 +1,10 @@
 <resources>
+    <!-- App Name and Activity Labels -->
     <string name="app_name">Shades</string>
+    <string name="shades_settings">Shades Settings</string>
 
+    <!-- ActionBar Action Titles -->
+
+    <!-- Misc -->
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
 </resources>
