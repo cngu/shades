@@ -1,7 +1,7 @@
 # Shades
 A simple screen filter app for Android.
 
-Shades lets you put on your figurative sunglasses when you look at your phone or tablet. You can use Shades to dim the screen even more than the lowest Android brightness setting, which your night-time-reading eyes will thank you for, or even give your screen a colored tint!
+Shades lets you [put on your figurative sunglasses](http://capcomprotour.com/wp-content/uploads/2015/03/GuileSunglasses-300x185.png) when you look at your phone or tablet. You can use Shades to dim the screen even more than the lowest Android brightness setting, which your night-time-reading eyes will thank you for, or even give your screen a colored tint!
 
 ## Features
 *
