@@ -1,8 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="AppTheme" parent="android:Theme.Holo.Light"/>
 
-    <style name="BaseAppTheme" parent="android:Theme.Holo.Light"/>
+    <style name="ShadesActivityTheme" parent="AppTheme">
 
-    <style name="AppTheme" parent="BaseAppTheme">
     </style>
-
 </resources>
