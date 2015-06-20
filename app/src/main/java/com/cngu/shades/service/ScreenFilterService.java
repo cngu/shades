@@ -38,4 +38,11 @@ public class ScreenFilterService extends Service {
         // Prevent binding.
         return null;
     }
+
+    @Override
+    public void onDestroy() {
+        if (DEBUG) Log.i(TAG, "onDestroy");
+
+        super.onDestroy();
+    }
 }
