@@ -41,8 +41,8 @@ public class ScreenFilterService extends Service {
 
     @Override
     public void onDestroy() {
-        if (DEBUG) Log.i(TAG, "onDestroy");
-
         super.onDestroy();
+
+        if (DEBUG) Log.i(TAG, "onDestroy");
     }
 }
