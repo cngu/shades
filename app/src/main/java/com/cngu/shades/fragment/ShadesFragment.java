@@ -49,7 +49,6 @@ public class ShadesFragment extends Fragment {
         if (presenter == null) {
             throw new IllegalArgumentException("presenter cannot be null");
         }
-
         this.presenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");

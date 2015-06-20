@@ -1,11 +1,14 @@
 package com.cngu.shades.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.cngu.shades.presenter.ScreenFilterPresenter;
 
 public class ScreenFilterView extends WindowView {
+    private static final String TAG = "ScreenFilterView";
+    private static final boolean DEBUG = true;
 
     private ScreenFilterPresenter presenter;
 
@@ -20,7 +23,7 @@ public class ScreenFilterView extends WindowView {
     }
 
     @Override
-    public void onFinishInflate() {
+    protected void onFinishInflate() {
         // TODO: Find filter by id
 
         super.onFinishInflate();
@@ -32,6 +35,11 @@ public class ScreenFilterView extends WindowView {
     }
 
     public void registerPresenter(ScreenFilterPresenter presenter) {
+        if (presenter == null) {
+            throw new IllegalArgumentException("presenter cannot be null");
+        }
         this.presenter = presenter;
+
+        if (DEBUG) Log.i(TAG, "Registered Presenter");
     }
 }
