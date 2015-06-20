@@ -12,6 +12,11 @@ public class ScreenFilterView extends WindowView {
     private static final String TAG = "ScreenFilterView";
     private static final boolean DEBUG = true;
 
+    private static final float MIN_DIM   = 0f;
+    private static final float MAX_DIM   = 100f;
+    private static final float MIN_ALPHA = 0f;
+    private static final float MAX_ALPHA = 0.75f;
+
     private ScreenFilterPresenter presenter;
     private ImageView screenFilter;
 
@@ -36,12 +41,27 @@ public class ScreenFilterView extends WindowView {
         return null;
     }
 
-    public void setOpacity(int opacity) {
-
+    /**
+     * Sets the dim level of the screen filter.
+     *
+     * @param dimLevel value between 0 and 100, inclusive, where 0 is fully transparent, and 100 is
+     *                 the maximum allowed dim level determined by the system, but is guaranteed to
+     *                 never be fully opaque.
+     */
+    public void setDimLevel(int dimLevel) {
+        float alpha = mapToRange((float)dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
+        screenFilter.setAlpha(alpha);
     }
 
-    public void setColor(int color) {
-
+    /**
+     * Sets the color tint of the screen filter.
+     *
+     * @param color RGB color represented by a 32-bit int; the format is the same as the one defined
+     *              in {@link android.graphics.Color}, but the alpha byte is ignored.
+     */
+    public void setRgbColor(int color) {
+        int rgbColor = stripAlpha(color);
+        screenFilter.setBackgroundColor(rgbColor);
     }
 
     public void registerPresenter(ScreenFilterPresenter presenter) {
@@ -51,5 +71,14 @@ public class ScreenFilterView extends WindowView {
         this.presenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
+    }
+
+    private int stripAlpha(int color) {
+        return color | 0xFF000000;
+    }
+
+    private float mapToRange(float value, float minInput, float maxInput,
+                             float minOutput, float maxOutput) {
+        return (value - minInput) * ((maxOutput - minOutput) / (maxInput - minInput)) + minOutput;
     }
 }
