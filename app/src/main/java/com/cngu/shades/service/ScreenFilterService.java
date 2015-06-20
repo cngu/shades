@@ -6,7 +6,10 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class ScreenFilterService extends Service {
-
+    public static final int COMMAND_ON = 0;
+    public static final int COMMAND_OFF = 1;
+    public static final int COMMAND_PAUSE = 2;
+    public static final int COMMAND_RESUME = 3;
 
     private static final String TAG = "ScreenFilterService";
     private static final boolean DEBUG = true;
