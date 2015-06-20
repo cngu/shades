@@ -11,6 +11,8 @@ public class ScreenFilterService extends Service {
     public static final int COMMAND_PAUSE = 2;
     public static final int COMMAND_RESUME = 3;
 
+    public static final String BUNDLE_KEY_COMMAND = "cngu.bundle.key.COMMAND";
+
     private static final String TAG = "ScreenFilterService";
     private static final boolean DEBUG = true;
 

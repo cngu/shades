@@ -3,7 +3,9 @@ package com.cngu.shades.view;
 import android.content.Context;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
+import com.cngu.shades.R;
 import com.cngu.shades.presenter.ScreenFilterPresenter;
 
 public class ScreenFilterView extends WindowView {
@@ -11,6 +13,7 @@ public class ScreenFilterView extends WindowView {
     private static final boolean DEBUG = true;
 
     private ScreenFilterPresenter presenter;
+    private ImageView screenFilter;
 
     public ScreenFilterView(Context context) {
         super(context);
@@ -18,13 +21,12 @@ public class ScreenFilterView extends WindowView {
 
     @Override
     protected int getContentLayoutResId() {
-        // TODO: Return a <merge> layout
-        return 0;
+        return R.layout.view_screen_filter;
     }
 
     @Override
     protected void onFinishInflate() {
-        // TODO: Find filter by id
+        screenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
 
         super.onFinishInflate();
     }
@@ -32,6 +34,14 @@ public class ScreenFilterView extends WindowView {
     @Override
     public WindowManager.LayoutParams getWindowLayoutParams() {
         return null;
+    }
+
+    public void setOpacity(int opacity) {
+
+    }
+
+    public void setColor(int color) {
+
     }
 
     public void registerPresenter(ScreenFilterPresenter presenter) {

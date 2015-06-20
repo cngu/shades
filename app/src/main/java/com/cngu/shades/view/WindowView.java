@@ -31,6 +31,14 @@ public abstract class WindowView extends FrameLayout {
         inflater.inflate(layoutResId, this, true);
     }
 
+    /**
+     * @return the {@link android.view.WindowManager.LayoutParams} that should be used when
+     *         opening a window for this WindowView.
+     */
     public abstract WindowManager.LayoutParams getWindowLayoutParams();
+
+    /**
+     * @return the resource id of the layout for the contents of this WindowView.
+     */
     protected abstract int getContentLayoutResId();
 }
