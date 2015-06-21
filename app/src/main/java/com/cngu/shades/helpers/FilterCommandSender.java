@@ -8,6 +8,9 @@ import android.content.Intent;
  *
  * <p>Use {@link FilterCommandFactory} to create valid commands.
  */
+/*
+ * This class is used primarily for dependency injection.
+ */
 public class FilterCommandSender {
 
     private Context context;

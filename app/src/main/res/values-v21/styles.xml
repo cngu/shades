@@ -2,4 +2,11 @@
 <resources>
     <style name="AppTheme" parent="android:Theme.Material.Light"/>
     <style name="AppTheme.ActionBar" parent="android:Widget.Material.ActionBar"/>
+
+    <!-- Preference TextView Style -->
+    <style name="PreferenceTextStyle">
+        <item name="android:textAppearance">@android:style/TextAppearance.Material.Subhead</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">marquee</item>
+    </style>
 </resources>
