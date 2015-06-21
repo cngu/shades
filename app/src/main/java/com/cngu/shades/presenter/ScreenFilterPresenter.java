@@ -1,10 +1,12 @@
 package com.cngu.shades.presenter;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 
 import com.cngu.shades.helpers.FilterCommandParser;
 import com.cngu.shades.manager.WindowViewManager;
+import com.cngu.shades.service.ScreenFilterService;
 import com.cngu.shades.view.ScreenFilterView;
 
 public class ScreenFilterPresenter {
@@ -52,8 +54,14 @@ public class ScreenFilterPresenter {
         state = offState;
     }
 
-    public void onFilterCommand(Intent command) {
+    public void onScreenFilterCommand(Intent command) {
+        int commandFlag = filterCommandParser.parseCommandFlag(command);
 
+        if (DEBUG) {
+            Log.i(TAG, String.format("Handling command: %d in current state: %s", commandFlag, state));
+        }
+
+        state.onScreenFilterCommand(commandFlag);
     }
 
     private void moveToState(State newState) {
@@ -66,7 +74,9 @@ public class ScreenFilterPresenter {
         state = newState;
     }
 
-    private class State {
+    private abstract class State {
+
+        protected abstract void onScreenFilterCommand(int commandFlag);
 
         @Override
         public String toString() {
@@ -75,18 +85,38 @@ public class ScreenFilterPresenter {
     }
 
     private class OnState extends State {
-
+        @Override
+        protected void onScreenFilterCommand(int commandFlag) {
+            if (commandFlag == ScreenFilterService.COMMAND_ON) {
+                windowViewManager.closeWindow(view);
+                moveToState(offState);
+            }
+        }
     }
 
     private class OffState extends State {
-
+        @Override
+        protected void onScreenFilterCommand(int commandFlag) {
+            if (commandFlag == ScreenFilterService.COMMAND_ON) {
+                view.setFilterDimLevel(50);
+                view.setFilterRgbColor(Color.RED);
+                windowViewManager.openWindow(view);
+                moveToState(onState);
+            }
+        }
     }
 
     private class PauseState extends State {
+        @Override
+        protected void onScreenFilterCommand(int commandFlag) {
 
+        }
     }
 
     private class ResumeState extends State {
+        @Override
+        protected void onScreenFilterCommand(int commandFlag) {
 
+        }
     }
 }

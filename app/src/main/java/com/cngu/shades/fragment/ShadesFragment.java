@@ -1,6 +1,7 @@
 package com.cngu.shades.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ public class ShadesFragment extends Fragment {
         startShadesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                presenter.onShadesFabClicked();
             }
         });
 
@@ -52,5 +53,9 @@ public class ShadesFragment extends Fragment {
         this.presenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
+    }
+
+    public void startService(Intent service) {
+        getActivity().startService(service);
     }
 }

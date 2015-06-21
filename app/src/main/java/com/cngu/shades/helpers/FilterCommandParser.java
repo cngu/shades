@@ -18,13 +18,13 @@ public class FilterCommandParser {
      *         {@link ScreenFilterService#COMMAND_PAUSE}, {@link ScreenFilterService#COMMAND_RESUME},
      *         or -1 if {@code intent} doesn't contain a valid command.
      */
-    public int parseCommand(Intent intent) {
+    public int parseCommandFlag(Intent intent) {
         int errorCode = -1;
 
         if (intent == null) {
             return errorCode;
         }
-        
+
         int commandFlag = intent.getIntExtra(ScreenFilterService.BUNDLE_KEY_COMMAND, errorCode);
         return commandFlag;
     }

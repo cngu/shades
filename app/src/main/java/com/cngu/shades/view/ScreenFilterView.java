@@ -1,6 +1,7 @@
 package com.cngu.shades.view;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -22,6 +23,8 @@ public class ScreenFilterView extends WindowView {
 
     public ScreenFilterView(Context context) {
         super(context);
+
+        screenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
     }
 
     @Override
@@ -30,15 +33,15 @@ public class ScreenFilterView extends WindowView {
     }
 
     @Override
-    protected void onFinishInflate() {
-        screenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
-
-        super.onFinishInflate();
-    }
-
-    @Override
     public WindowManager.LayoutParams getWindowLayoutParams() {
-        return null;
+        return new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                //0,
+                //0,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT);
     }
 
     /**
@@ -48,9 +51,15 @@ public class ScreenFilterView extends WindowView {
      *                 the maximum allowed dim level determined by the system, but is guaranteed to
      *                 never be fully opaque.
      */
-    public void setDimLevel(int dimLevel) {
-        float alpha = mapToRange((float)dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
-        screenFilter.setAlpha(alpha);
+    public void setFilterDimLevel(int dimLevel) {
+        float alpha = mapToRange((float) dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
+
+        if (screenFilter != null) {
+            screenFilter.setAlpha(alpha);
+        }
+        if (DEBUG) {
+            Log.i(TAG, String.format("Set filter alpha to: %.2f", alpha));
+        }
     }
 
     /**
@@ -59,9 +68,14 @@ public class ScreenFilterView extends WindowView {
      * @param color RGB color represented by a 32-bit int; the format is the same as the one defined
      *              in {@link android.graphics.Color}, but the alpha byte is ignored.
      */
-    public void setRgbColor(int color) {
+    public void setFilterRgbColor(int color) {
         int rgbColor = stripAlpha(color);
-        screenFilter.setBackgroundColor(rgbColor);
+
+        if (screenFilter != null) {
+            screenFilter.setBackgroundColor(rgbColor);
+        }
+
+        if (DEBUG) Log.i(TAG, String.format("Set filter RGB to 0x%s", Integer.toHexString(rgbColor)));
     }
 
     public void registerPresenter(ScreenFilterPresenter presenter) {

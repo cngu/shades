@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
+import com.cngu.shades.helpers.FilterCommandFactory;
 import com.cngu.shades.presenter.ShadesPresenter;
 
 public class ShadesActivity extends Activity {
@@ -42,6 +43,7 @@ public class ShadesActivity extends Activity {
         }
 
         // Connect MVP View and Presenter
-        presenter = new ShadesPresenter(view);
+        FilterCommandFactory filterCommandFactory = new FilterCommandFactory(this);
+        presenter = new ShadesPresenter(view, filterCommandFactory);
     }
 }
