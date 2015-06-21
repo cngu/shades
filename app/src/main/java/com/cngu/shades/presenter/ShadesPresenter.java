@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.cngu.shades.fragment.ShadesFragment;
 import com.cngu.shades.helpers.FilterCommandFactory;
+import com.cngu.shades.helpers.FilterCommandSender;
 import com.cngu.shades.service.ScreenFilterService;
 
 public class ShadesPresenter {
@@ -13,17 +14,23 @@ public class ShadesPresenter {
 
     private ShadesFragment view;
     private FilterCommandFactory filterCommandFactory;
+    private FilterCommandSender filterCommandSender;
 
-    public ShadesPresenter(ShadesFragment view, FilterCommandFactory filterCommandFactory) {
+    public ShadesPresenter(ShadesFragment view, FilterCommandFactory filterCommandFactory,
+                           FilterCommandSender filterCommandSender) {
         if (view == null) {
             throw new IllegalArgumentException("view cannot be null");
         }
         if (filterCommandFactory == null) {
             throw new IllegalArgumentException("filterCommandFactory cannot be null");
         }
+        if (filterCommandSender == null) {
+            throw new IllegalArgumentException("filterCommandSender cannot be null");
+        }
 
         this.view = view;
         this.filterCommandFactory = filterCommandFactory;
+        this.filterCommandSender = filterCommandSender;
 
         this.view.registerPresenter(this);
 
@@ -33,7 +40,6 @@ public class ShadesPresenter {
     public void onShadesFabClicked() {
         Intent command = filterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
 
-        // TODO: Refactor this out into a FilterCommandSender.send(Intent command)
-        view.startService(command);
+        filterCommandSender.send(command);
     }
 }

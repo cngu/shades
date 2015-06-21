@@ -54,8 +54,4 @@ public class ShadesFragment extends Fragment {
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
     }
-
-    public void startService(Intent service) {
-        getActivity().startService(service);
-    }
 }
