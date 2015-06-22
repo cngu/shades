@@ -18,13 +18,13 @@ public class ScreenFilterView extends WindowView {
     private static final float MIN_ALPHA = 0f;
     private static final float MAX_ALPHA = 0.75f;
 
-    private ScreenFilterPresenter presenter;
-    private ImageView screenFilter;
+    private ScreenFilterPresenter mPresenter;
+    private ImageView mScreenFilter;
 
     public ScreenFilterView(Context context) {
         super(context);
 
-        screenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
+        mScreenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class ScreenFilterView extends WindowView {
     public void setFilterDimLevel(int dimLevel) {
         float alpha = mapToRange((float) dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
 
-        if (screenFilter != null) {
-            screenFilter.setAlpha(alpha);
+        if (mScreenFilter != null) {
+            mScreenFilter.setAlpha(alpha);
         }
         if (DEBUG) {
             Log.i(TAG, String.format("Set filter alpha to: %.2f", alpha));
@@ -71,8 +71,8 @@ public class ScreenFilterView extends WindowView {
     public void setFilterRgbColor(int color) {
         int rgbColor = stripAlpha(color);
 
-        if (screenFilter != null) {
-            screenFilter.setBackgroundColor(rgbColor);
+        if (mScreenFilter != null) {
+            mScreenFilter.setBackgroundColor(rgbColor);
         }
 
         if (DEBUG) Log.i(TAG, String.format("Set filter RGB to 0x%s", Integer.toHexString(rgbColor)));
@@ -82,7 +82,7 @@ public class ScreenFilterView extends WindowView {
         if (presenter == null) {
             throw new IllegalArgumentException("presenter cannot be null");
         }
-        this.presenter = presenter;
+        mPresenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
     }

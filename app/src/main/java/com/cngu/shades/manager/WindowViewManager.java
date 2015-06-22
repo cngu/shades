@@ -10,10 +10,9 @@ import com.cngu.shades.view.WindowView;
  */
 public class WindowViewManager {
 
-    private WindowManager windowManager;
+    private WindowManager mWindowManager;
 
-    public WindowViewManager(WindowManager windowManager) {
-        this.windowManager = windowManager;
+    public WindowViewManager(WindowManager windowManager) { mWindowManager = windowManager;
     }
 
     /**
@@ -21,7 +20,7 @@ public class WindowViewManager {
      * @param view the view to render in the new Window.
      */
     public void openWindow(WindowView view) {
-        windowManager.addView(view, view.getWindowLayoutParams());
+        mWindowManager.addView(view, view.getWindowLayoutParams());
     }
 
     /**
@@ -29,6 +28,6 @@ public class WindowViewManager {
      * @param view the Window containing this view will be closed.
      */
     public void closeWindow(WindowView view) {
-        windowManager.removeView(view);
+        mWindowManager.removeView(view);
     }
 }

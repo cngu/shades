@@ -11,7 +11,7 @@ public class ShadesFragment extends PreferenceFragment {
     private static final String TAG = "ShadesFragment";
     private static final boolean DEBUG = true;
 
-    private ShadesPresenter presenter;
+    private ShadesPresenter mPresenter;
 
     public ShadesFragment() {
         // Android Fragments require an explicit public default constructor for re-creation
@@ -28,7 +28,7 @@ public class ShadesFragment extends PreferenceFragment {
         if (presenter == null) {
             throw new IllegalArgumentException("presenter cannot be null");
         }
-        this.presenter = presenter;
+        mPresenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
     }

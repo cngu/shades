@@ -13,13 +13,13 @@ import android.content.Intent;
  */
 public class FilterCommandSender {
 
-    private Context context;
+    private Context mContext;
 
     public FilterCommandSender(Context context) {
-        this.context = context;
+        mContext = context;
     }
 
     public void send(Intent command) {
-        context.startService(command);
+        mContext.startService(command);
     }
 }

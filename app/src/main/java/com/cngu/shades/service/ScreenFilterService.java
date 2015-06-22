@@ -1,6 +1,5 @@
 package com.cngu.shades.service;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +25,7 @@ public class ScreenFilterService extends Service {
     private static final String TAG = "ScreenFilterService";
     private static final boolean DEBUG = true;
 
-    private ScreenFilterPresenter presenter;
+    private ScreenFilterPresenter mPresenter;
 
     @Override
     public void onCreate() {
@@ -42,14 +41,14 @@ public class ScreenFilterService extends Service {
         WindowViewManager windowViewManager = new WindowViewManager(windowManager);
         FilterCommandParser filterCommandParser = new FilterCommandParser();
 
-        presenter = new ScreenFilterPresenter(view, windowViewManager, filterCommandParser);
+        mPresenter = new ScreenFilterPresenter(view, windowViewManager, filterCommandParser);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (DEBUG) Log.i(TAG, String.format("onStartCommand(%s, %d, %d", intent, flags, startId));
 
-        presenter.onScreenFilterCommand(intent);
+        mPresenter.onScreenFilterCommand(intent);
 
         // Do not attempt to restart if the hosting process is killed by Android
         return START_NOT_STICKY;

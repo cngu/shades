@@ -12,9 +12,9 @@ public class ShadesPresenter {
     private static final String TAG = "ShadesPresenter";
     private static final boolean DEBUG = true;
 
-    private ShadesFragment view;
-    private FilterCommandFactory filterCommandFactory;
-    private FilterCommandSender filterCommandSender;
+    private ShadesFragment mView;
+    private FilterCommandFactory mFilterCommandFactory;
+    private FilterCommandSender mFilterCommandSender;
 
     public ShadesPresenter(ShadesFragment view, FilterCommandFactory filterCommandFactory,
                            FilterCommandSender filterCommandSender) {
@@ -28,18 +28,18 @@ public class ShadesPresenter {
             throw new IllegalArgumentException("filterCommandSender cannot be null");
         }
 
-        this.view = view;
-        this.filterCommandFactory = filterCommandFactory;
-        this.filterCommandSender = filterCommandSender;
+        mView = view;
+        mFilterCommandFactory = filterCommandFactory;
+        mFilterCommandSender = filterCommandSender;
 
-        this.view.registerPresenter(this);
+        mView.registerPresenter(this);
 
         if (DEBUG) Log.i(TAG, "Registered View");
     }
 
     public void onShadesFabClicked() {
-        Intent command = filterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
+        Intent command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
 
-        filterCommandSender.send(command);
+        mFilterCommandSender.send(command);
     }
 }

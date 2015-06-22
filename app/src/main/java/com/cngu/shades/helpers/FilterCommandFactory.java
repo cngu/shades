@@ -13,10 +13,10 @@ import com.cngu.shades.service.ScreenFilterService;
  */
 public class FilterCommandFactory {
 
-    private Context context;
+    private Context mContext;
 
     public FilterCommandFactory(Context context) {
-        this.context = context;
+        mContext = context;
     }
 
     /**
@@ -35,7 +35,7 @@ public class FilterCommandFactory {
             screenFilterServiceCommand > ScreenFilterService.VALID_COMMAND_END) {
             command = null;
         } else {
-            command = new Intent(context, ScreenFilterService.class);
+            command = new Intent(mContext, ScreenFilterService.class);
             command.putExtra(ScreenFilterService.BUNDLE_KEY_COMMAND, screenFilterServiceCommand);
         }
 

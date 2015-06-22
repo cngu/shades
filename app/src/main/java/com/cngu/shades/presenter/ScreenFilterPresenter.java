@@ -13,15 +13,15 @@ public class ScreenFilterPresenter {
     private static final String TAG = "ScreenFilterPresenter";
     private static final boolean DEBUG = true;
 
-    private ScreenFilterView view;
-    private WindowViewManager windowViewManager;
-    private FilterCommandParser filterCommandParser;
+    private ScreenFilterView mView;
+    private WindowViewManager mWindowViewManager;
+    private FilterCommandParser mFilterCommandParser;
 
-    private State state;
-    private State onState;
-    private State offState;
-    private State pauseState;
-    private State resumeState;
+    private State mState;
+    private State mOnState;
+    private State mOffState;
+    private State mPauseState;
+    private State mResumeState;
 
     public ScreenFilterPresenter(ScreenFilterView view, WindowViewManager windowViewManager,
                                  FilterCommandParser filterCommandParser) {
@@ -35,33 +35,33 @@ public class ScreenFilterPresenter {
             throw new IllegalArgumentException("filterCommandParser cannot be null");
         }
 
-        this.view = view;
-        this.windowViewManager = windowViewManager;
-        this.filterCommandParser = filterCommandParser;
+        mView = view;
+        mWindowViewManager = windowViewManager;
+        mFilterCommandParser = filterCommandParser;
 
-        view.registerPresenter(this);
+        mView.registerPresenter(this);
 
         initializeStates();
     }
 
     private void initializeStates() {
-        onState = new OnState();
-        offState = new OffState();
-        pauseState = new PauseState();
-        resumeState = new ResumeState();
+        mOnState = new OnState();
+        mOffState = new OffState();
+        mPauseState = new PauseState();
+        mResumeState = new ResumeState();
 
         // TODO: What should the default state be?
-        state = offState;
+        mState = mOffState;
     }
 
     public void onScreenFilterCommand(Intent command) {
-        int commandFlag = filterCommandParser.parseCommandFlag(command);
+        int commandFlag = mFilterCommandParser.parseCommandFlag(command);
 
         if (DEBUG) {
-            Log.i(TAG, String.format("Handling command: %d in current state: %s", commandFlag, state));
+            Log.i(TAG, String.format("Handling command: %d in current state: %s", commandFlag, mState));
         }
 
-        state.onScreenFilterCommand(commandFlag);
+        mState.onScreenFilterCommand(commandFlag);
     }
 
     private void moveToState(State newState) {
@@ -69,9 +69,9 @@ public class ScreenFilterPresenter {
             throw new IllegalArgumentException("newState cannot be null");
         }
 
-        if (DEBUG) Log.i(TAG, String.format("Transitioning state from %s to %s", state, newState));
+        if (DEBUG) Log.i(TAG, String.format("Transitioning state from %s to %s", mState, newState));
 
-        state = newState;
+        mState = newState;
     }
 
     private abstract class State {
@@ -88,8 +88,8 @@ public class ScreenFilterPresenter {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                windowViewManager.closeWindow(view);
-                moveToState(offState);
+                mWindowViewManager.closeWindow(mView);
+                moveToState(mOffState);
             }
         }
     }
@@ -98,10 +98,10 @@ public class ScreenFilterPresenter {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                view.setFilterDimLevel(50);
-                view.setFilterRgbColor(Color.RED);
-                windowViewManager.openWindow(view);
-                moveToState(onState);
+                mView.setFilterDimLevel(50);
+                mView.setFilterRgbColor(Color.RED);
+                mWindowViewManager.openWindow(mView);
+                moveToState(mOnState);
             }
         }
     }

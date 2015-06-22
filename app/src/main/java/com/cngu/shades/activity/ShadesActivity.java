@@ -16,7 +16,7 @@ public class ShadesActivity extends Activity {
     private static final boolean DEBUG = true;
     private static final String FRAGMENT_TAG_SHADES = "cngu.fragment.tag.SHADES";
 
-    private ShadesPresenter presenter;
+    private ShadesPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,6 @@ public class ShadesActivity extends Activity {
         // Connect MVP View and Presenter
         FilterCommandFactory filterCommandFactory = new FilterCommandFactory(this);
         FilterCommandSender filterCommandSender = new FilterCommandSender(this);
-        presenter = new ShadesPresenter(view, filterCommandFactory, filterCommandSender);
+        mPresenter = new ShadesPresenter(view, filterCommandFactory, filterCommandSender);
     }
 }
