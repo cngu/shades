@@ -55,6 +55,7 @@ public class ScreenFilterService extends Service {
         mPresenter = new ScreenFilterPresenter(view, windowViewManager, filterCommandParser);
     }
 
+    // TODO: Wrap this in a SettingsManager
     SharedPreferences mSharedPreferences;
 
     @Override

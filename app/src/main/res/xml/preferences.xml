@@ -3,21 +3,22 @@
 
     <PreferenceCategory android:title="@string/pref_title_appearance">
         <com.cngu.shades.preference.DimSeekBarPreference
-            android:key="pref_key_shades_dim_level"
+            android:key="@string/pref_key_shades_dim_level"
             android:defaultValue="50" />
 
         <com.cngu.shades.preference.ColorPickerPreference
-            android:key="pref_key_shades_color"
-            android:title="@string/shades_color" />
+            android:key="@string/pref_key_shades_color"
+            android:title="@string/shades_color"
+            android:defaultValue="0"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_title_startup">
         <CheckBoxPreference
-            android:key="pref_key_keep_running_after_reboot"
+            android:key="@string/pref_key_keep_running_after_reboot"
             android:title="@string/keep_running_after_reboot"
             android:defaultValue="false" />
         <CheckBoxPreference
-            android:key="pref_key_always_open_on_startup"
+            android:key="@string/pref_key_always_open_on_startup"
             android:title="@string/always_open_on_startup"
             android:defaultValue="false" />
     </PreferenceCategory>
