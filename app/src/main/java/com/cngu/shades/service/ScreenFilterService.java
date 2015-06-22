@@ -3,7 +3,9 @@ package com.cngu.shades.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -27,6 +29,15 @@ public class ScreenFilterService extends Service {
 
     private ScreenFilterPresenter mPresenter;
 
+    private SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            int changedValue = sharedPreferences.getInt(key, -1);
+            Log.d(TAG, "Pref " + key + " changed to " + changedValue);
+        }
+    };
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -44,9 +55,14 @@ public class ScreenFilterService extends Service {
         mPresenter = new ScreenFilterPresenter(view, windowViewManager, filterCommandParser);
     }
 
+    SharedPreferences mSharedPreferences;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (DEBUG) Log.i(TAG, String.format("onStartCommand(%s, %d, %d", intent, flags, startId));
+
+        mSharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
 
         mPresenter.onScreenFilterCommand(intent);
 
@@ -65,5 +81,7 @@ public class ScreenFilterService extends Service {
         super.onDestroy();
 
         if (DEBUG) Log.i(TAG, "onDestroy");
+
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener);
     }
 }
