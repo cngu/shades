@@ -47,6 +47,8 @@ public class ShadesFragment extends PreferenceFragment {
             }
         });
 
+        // NOTE: Wait until layout to find the padding and x/y locations. For some reason, onStart()
+        //       and onResume() both occur before the FAB is measured.
         mShadesFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
