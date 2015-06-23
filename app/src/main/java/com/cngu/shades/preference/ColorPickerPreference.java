@@ -44,7 +44,7 @@ public class ColorPickerPreference extends Preference {
     }
 
     @Override
-    protected void onBindView(View view) {
+    protected void onBindView(final View view) {
         super.onBindView(view);
 
         mColorPicker = (ColorPicker) view.findViewById(R.id.color_picker);

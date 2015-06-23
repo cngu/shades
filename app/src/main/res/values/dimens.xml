@@ -9,6 +9,9 @@
     <dimen name="preference_padding_start">8dp</dimen>
     <dimen name="preference_padding_end">8dp</dimen>
 
+    <dimen name="colored_circle_size">48dp</dimen>
+    <dimen name="colored_circle_padding">10dp</dimen>
+
     <!-- FAB -->
     <dimen name="fab_size_normal">56dp</dimen>
 </resources>

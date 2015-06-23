@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/color_picker"
     android:layout_width="match_parent"
-    android:layout_height="102dp"
+    android:layout_height="wrap_content"
     android:gravity="center"
     android:layout_marginTop="6dp"
     android:verticalSpacing="6dp"
