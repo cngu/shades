@@ -14,7 +14,7 @@
     <Button
         android:id="@+id/shades_fab"
         android:layout_width="wrap_content"
-        android:layout_height="150dp"
+        android:layout_height="@dimen/fab_size_normal"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"

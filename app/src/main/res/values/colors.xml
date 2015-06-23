@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="default_window_background">@color/indigo_400</color>
+    <!-- Theme Colors -->
+    <color name="color_primary">@color/blue_grey_800</color>
+    <color name="color_primary_dark">@color/blue_grey_900</color>
+
+    <!-- Widgets -->
+    <color name="fab_background"></color>
 </resources>

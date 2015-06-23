@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="android:Theme.Holo.Light"/>
-    <style name="AppTheme.ActionBar" parent="android:Widget.Holo.ActionBar"/>
-
-    <style name="ShadesActivityTheme" parent="AppTheme">
-        <item name="android:windowBackground">@color/default_window_background</item>
-        <item name="android:actionBarStyle">@style/ShadesActivityTheme.ActionBar</item>
-    </style>
-
-    <style name="ShadesActivityTheme.ActionBar" parent="AppTheme.ActionBar">
-        <item name="android:background">@null</item>
-        <item name="android:displayOptions">useLogo|showTitle</item>
+    <!-- App Themes -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
     </style>
 
     <!-- Preference TextView Style -->

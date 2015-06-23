@@ -1,8 +1,8 @@
 package com.cngu.shades.activity;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.cngu.shades.R;
@@ -11,7 +11,7 @@ import com.cngu.shades.helpers.FilterCommandFactory;
 import com.cngu.shades.helpers.FilterCommandSender;
 import com.cngu.shades.presenter.ShadesPresenter;
 
-public class ShadesActivity extends Activity {
+public class ShadesActivity extends AppCompatActivity {
     private static final String TAG = "ShadesActivity";
     private static final boolean DEBUG = true;
     private static final String FRAGMENT_TAG_SHADES = "cngu.fragment.tag.SHADES";
