@@ -1,25 +1,24 @@
 package com.cngu.shades.preference;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.preference.DialogPreference;
+import android.content.res.TypedArray;
 import android.preference.Preference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.SeekBar;
 
 import com.cngu.shades.R;
 import com.cngu.shades.adapter.ColorAdapter;
 import com.cngu.shades.widget.ColorPicker;
 
 public class ColorPickerPreference extends Preference {
-    private static final String TAG = "ColorPickerPreference";
-    private static final boolean DEBUG = true;
+
+    // Changes to DEFAULT_VALUE should be reflected in preferences.xml
+    private static final int DEFAULT_VALUE = 0xFF000000;
 
     private ColorPicker mColorPicker;
     private ColorAdapter mColorAdapter;
+    private int mSelectedColor;
 
     public ColorPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -27,6 +26,21 @@ public class ColorPickerPreference extends Preference {
         mColorAdapter = new ColorAdapter(context);
 
         setLayoutResource(R.layout.preference_color_picker);
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInteger(index, DEFAULT_VALUE);
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        if (restorePersistedValue) {
+            mSelectedColor = getPersistedInt(DEFAULT_VALUE);
+        } else {
+            mSelectedColor = (Integer) defaultValue;
+            persistInt(mSelectedColor);
+        }
     }
 
     @Override
@@ -38,19 +52,23 @@ public class ColorPickerPreference extends Preference {
     }
 
     private void initLayout() {
+        int selectedColorPosition = mColorAdapter.getPosition(mSelectedColor);
+        if (selectedColorPosition == -1) {
+            throw new IllegalStateException("default color for ColorPickerPreference is not defined");
+        }
+        mColorAdapter.setSelectedPosition(selectedColorPosition);
+
         mColorPicker.setAdapter(mColorAdapter);
 
         mColorPicker.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                // TODO: This should ignore clicks on already-selected-items
-
                 mColorAdapter.setSelectedPosition(position);
                 mColorAdapter.notifyDataSetChanged();
 
-                int selectedColor = (Integer) mColorAdapter.getItem(position);
-                if (DEBUG) Log.d(TAG, "Selected color: " + Integer.toHexString(selectedColor) + " at index: " + mColorAdapter.getPosition(selectedColor));
-                // TODO: persist selected color
+                mSelectedColor = (Integer) mColorAdapter.getItem(position);
+
+                persistInt(mSelectedColor);
             }
         });
     }

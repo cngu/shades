@@ -100,7 +100,6 @@ public class ScreenFilterPresenter {
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
                 mView.setFilterDimLevel(100);
-                //mView.setFilterRgbColor(mView.getContext().getResources().getColor(R.color.red_100));
                 mView.setFilterRgbColor(Color.BLACK);
                 mWindowViewManager.openWindow(mView);
                 moveToState(mOnState);

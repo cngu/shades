@@ -8,7 +8,7 @@
 
         <com.cngu.shades.preference.ColorPickerPreference
             android:key="@string/pref_key_shades_color"
-            android:defaultValue="#ff000000"/>
+            android:defaultValue="0xFF000000"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/pref_title_startup">
