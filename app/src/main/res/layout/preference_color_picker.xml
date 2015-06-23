@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content">
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:gravity="center_vertical|center_horizontal"
+             android:paddingLeft="@dimen/preference_padding_start"
+             android:paddingStart="@dimen/preference_padding_start"
+             android:paddingRight="@dimen/preference_padding_end"
+             android:paddingEnd="@dimen/preference_padding_end">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="[COLOR PICKER HERE]" />
+        android:orientation="vertical"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/shades_color"
+            style="@style/PreferenceTextStyle" />
+
+        <include layout="@layout/color_picker" />
+
+    </LinearLayout>
 
 </FrameLayout>

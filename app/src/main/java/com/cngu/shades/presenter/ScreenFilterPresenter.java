@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.cngu.shades.R;
 import com.cngu.shades.helpers.FilterCommandParser;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.service.ScreenFilterService;
@@ -98,8 +99,9 @@ public class ScreenFilterPresenter {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                mView.setFilterDimLevel(50);
-                mView.setFilterRgbColor(Color.RED);
+                mView.setFilterDimLevel(100);
+                //mView.setFilterRgbColor(mView.getContext().getResources().getColor(R.color.red_100));
+                mView.setFilterRgbColor(Color.BLACK);
                 mWindowViewManager.openWindow(mView);
                 moveToState(mOnState);
             }

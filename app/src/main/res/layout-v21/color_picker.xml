@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cngu.shades.widget.ColorPicker
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/color_picker"
+    android:layout_width="match_parent"
+    android:layout_height="102dp"
+    android:gravity="center"
+    android:layout_marginTop="6dp"
+    android:verticalSpacing="6dp"
+    android:horizontalSpacing="6dp"
+    android:stretchMode="columnWidth"
+    android:numColumns="5"
+    android:listSelector="@android:color/transparent"
+    android:drawSelectorOnTop="true" />
