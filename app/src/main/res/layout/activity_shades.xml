@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,17 +11,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
+    <!--
+        Many attributes are set here to address the bugs in com.android.support:design:22.2.0 when
+        running API level 21:
+        - borderWidth is required to show the shadow
+        - layout_marginRight and layout_marginBottom are required because default margins are not set
+
+        Note:
+        - Consider coloring the actual drawable png instead of applying tint
+        - backgroundTint normally uses colorAccent, but we don't set colorAccent because we want a
+          white FAB, but not a white accent (that Android will tint other widgets with)
+    -->
+    <android.support.design.widget.FloatingActionButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/shades_fab"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/fab_size_normal"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="5dp"
-        android:text="TEST FAB"/>
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/fab_margin_right_bug"
+        android:layout_marginBottom="@dimen/fab_margin_bottom_bug"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_shades"
+        android:tint="@color/fab_icon_tint"
+        app:backgroundTint="@color/fab_background_tint"
+        app:fabSize="normal"
+        app:borderWidth="0dp" />
 
-</RelativeLayout>
+</FrameLayout>
 
 
 

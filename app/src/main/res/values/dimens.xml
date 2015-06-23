@@ -13,5 +13,6 @@
     <dimen name="colored_circle_padding">10dp</dimen>
 
     <!-- FAB -->
-    <dimen name="fab_size_normal">56dp</dimen>
+    <dimen name="fab_margin_right_bug">0dp</dimen>
+    <dimen name="fab_margin_bottom_bug">0dp</dimen>
 </resources>

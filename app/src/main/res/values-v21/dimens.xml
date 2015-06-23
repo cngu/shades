@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- Preferences -->
     <dimen name="preference_padding_start">16dp</dimen>
     <dimen name="preference_padding_end">16dp</dimen>
+
+    <!-- FAB -->
+    <dimen name="fab_margin_right_bug">16dp</dimen>
+    <dimen name="fab_margin_bottom_bug">16dp</dimen>
 </resources>
