@@ -57,7 +57,7 @@ public class ShadesFragment extends PreferenceFragment {
                 // Obtain a reference to the internal PreferenceFragment ListView
                 ListView prefFragListView = (ListView) getActivity().findViewById(android.R.id.list);
 
-                // Add a bottom padding to the ListView to accomodate the FAB
+                // Add a bottom padding to the ListView to accommodate the FAB
                 int paddingTop = prefFragListView.getPaddingTop();
                 int paddingLeft = prefFragListView.getPaddingLeft();
                 int paddingRight = prefFragListView.getPaddingRight();
