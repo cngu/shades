@@ -1,12 +1,16 @@
 package com.cngu.shades.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.v4.widget.Space;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.cngu.shades.R;
@@ -44,24 +48,33 @@ public class ShadesFragment extends PreferenceFragment {
 
         // NOTE: Wait until layout to find the padding and x/y locations. For some reason, onStart()
         //       and onResume() both occur before the FAB is measured.
-        mShadesFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-                mShadesFab.removeOnLayoutChangeListener(this);
+        final ViewTreeObserver viewTreeObserver = mShadesFab.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    // Must obtain the most up-to-date ViewTreeObserver here
+                    mShadesFab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-                // Obtain a reference to the internal PreferenceFragment ListView
-                ListView prefFragListView = (ListView) getActivity().findViewById(android.R.id.list);
+                    // Obtain a reference to the internal PreferenceFragment ListView
+                    final ListView prefFragListView = (ListView) getActivity().findViewById(android.R.id.list);
 
-                // Add a bottom padding to the ListView to accommodate the FAB
-                int paddingTop = prefFragListView.getPaddingTop();
-                int paddingLeft = prefFragListView.getPaddingLeft();
-                int paddingRight = prefFragListView.getPaddingRight();
-                int paddingBottom = prefFragListView.getPaddingBottom() +
-                        prefFragListView.getBottom() - mShadesFab.getTop();
+                    // Add a bottom padding to the ListView to accommodate the FAB
+                    int paddingTop = prefFragListView.getPaddingTop();
+                    int paddingLeft = prefFragListView.getPaddingLeft();
+                    int paddingRight = prefFragListView.getPaddingRight();
+                    int paddingBottom = prefFragListView.getPaddingBottom() +
+                            prefFragListView.getBottom() - mShadesFab.getTop();
 
-                prefFragListView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-            }
-        });
+                    // frameworks/base/core/res/res/layout/preference_list_fragment.xml already
+                    // disables clipToPadding for us, but we disable it again in case this changes
+                    // in future versions.
+                    prefFragListView.setClipToPadding(false);
+                    prefFragListView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+                    prefFragListView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+                }
+            });
+        }
 
         return v;
     }
