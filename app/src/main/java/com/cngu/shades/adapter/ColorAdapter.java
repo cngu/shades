@@ -45,8 +45,8 @@ public class ColorAdapter extends BaseAdapter {
                     resources.getColor(R.color.blue_grey_500),
                     resources.getColor(R.color.pink_500),
                     resources.getColor(R.color.deep_orange_500),
-                    resources.getColor(R.color.teal_500),
-                    resources.getColor(R.color.deep_purple_500)
+                    resources.getColor(R.color.deep_purple_500),
+                    resources.getColor(R.color.teal_500)
             };
         }
     }
