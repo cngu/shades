@@ -84,12 +84,12 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
 
     //region OnSettingsChangedListener
     @Override
-    public void onDimLevelChanged(int dimLevel) {
+    public void onShadesDimLevelChanged(int dimLevel) {
         mView.setFilterDimLevel(dimLevel);
     }
 
     @Override
-    public void onColorChanged(int color) {
+    public void onShadesColorChanged(int color) {
         mView.setFilterRgbColor(color);
     }
     //endregion

@@ -3,7 +3,9 @@ package com.cngu.shades.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.Preference;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -12,7 +14,7 @@ import com.cngu.shades.adapter.ColorAdapter;
 import com.cngu.shades.widget.ColorPicker;
 
 public class ColorPickerPreference extends Preference {
-
+    private static final String TAG = "ColorPickerPreference";
     // Changes to DEFAULT_VALUE should be reflected in preferences.xml
     public static final int DEFAULT_VALUE = 0xFF000000;
 
@@ -44,7 +46,7 @@ public class ColorPickerPreference extends Preference {
     }
 
     @Override
-    protected void onBindView(final View view) {
+    protected void onBindView(@NonNull View view) {
         super.onBindView(view);
 
         mColorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
@@ -54,7 +56,8 @@ public class ColorPickerPreference extends Preference {
     private void initLayout() {
         int selectedColorPosition = mColorAdapter.getPosition(mSelectedColor);
         if (selectedColorPosition == -1) {
-            throw new IllegalStateException("default color for ColorPickerPreference is not defined");
+            Log.e(TAG, "default color found in ColorAdapter; using first available color");
+            selectedColorPosition = 0;
         }
         mColorAdapter.setSelectedPosition(selectedColorPosition);
 

@@ -8,18 +8,33 @@ import com.cngu.shades.preference.ColorPickerPreference;
 import com.cngu.shades.preference.DimSeekBarPreference;
 
 public class SettingsModel implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private SharedPreferences mSharedPreferences;
     private OnSettingsChangedListener mSettingsChangedListener;
 
     private String mDimPrefKey;
     private String mColorPrefKey;
 
-    public SettingsModel(Resources resources) {
+    public SettingsModel(Resources resources, SharedPreferences sharedPreferences) {
         if (resources == null) {
             throw new IllegalArgumentException("resources cannot be null");
         }
+        if (sharedPreferences == null) {
+            throw new IllegalArgumentException("sharedPreferences cannot be null");
+        }
+
+        mSharedPreferences = sharedPreferences;
 
         mDimPrefKey = resources.getString(R.string.pref_key_shades_dim_level);
         mColorPrefKey = resources.getString(R.string.pref_key_shades_color);
+    }
+
+    public int getShadesDimLevel() {
+        return mSharedPreferences.getInt(mDimPrefKey, DimSeekBarPreference.DEFAULT_VALUE);
+    }
+
+    public int getShadesColor() {
+        return mSharedPreferences.getInt(mColorPrefKey, ColorPickerPreference.DEFAULT_VALUE);
     }
 
     @Override
@@ -30,13 +45,13 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
 
         if (key.equals(mDimPrefKey))
         {
-            int dimLevel = sharedPreferences.getInt(key, DimSeekBarPreference.DEFAULT_VALUE);
-            mSettingsChangedListener.onDimLevelChanged(dimLevel);
+            int dimLevel = getShadesDimLevel();
+            mSettingsChangedListener.onShadesDimLevelChanged(dimLevel);
         }
         else if (key.equals(mColorPrefKey))
         {
-            int color = sharedPreferences.getInt(key, ColorPickerPreference.DEFAULT_VALUE);
-            mSettingsChangedListener.onColorChanged(color);
+            int color = getShadesColor();
+            mSettingsChangedListener.onShadesColorChanged(color);
         }
     }
 
@@ -45,7 +60,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
     }
 
     public interface OnSettingsChangedListener {
-        void onDimLevelChanged(int dimLevel);
-        void onColorChanged(int color);
+        void onShadesDimLevelChanged(int dimLevel);
+        void onShadesColorChanged(int color);
     }
 }

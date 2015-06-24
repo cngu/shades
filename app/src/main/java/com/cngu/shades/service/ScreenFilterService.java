@@ -53,8 +53,8 @@ public class ScreenFilterService extends Service {
         ScreenManager sm = new ScreenManager(this, windowManager);
         FilterCommandParser fcp = new FilterCommandParser();
 
-        mSettingsModel = new SettingsModel(context.getResources());
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSettingsModel = new SettingsModel(context.getResources(), mSharedPreferences);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSettingsModel);
 
         mPresenter = new ScreenFilterPresenter(view, mSettingsModel, wvm, sm, fcp);
