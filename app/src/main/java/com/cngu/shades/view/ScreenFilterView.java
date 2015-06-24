@@ -1,9 +1,7 @@
 package com.cngu.shades.view;
 
 import android.content.Context;
-import android.graphics.PixelFormat;
 import android.util.Log;
-import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.cngu.shades.R;
@@ -18,11 +16,13 @@ public class ScreenFilterView extends WindowView {
     private static final float MIN_ALPHA = 0f;
     private static final float MAX_ALPHA = 0.75f;
 
+    private Context mContext;
     private ScreenFilterPresenter mPresenter;
     private ImageView mScreenFilter;
 
     public ScreenFilterView(Context context) {
         super(context);
+        mContext = context;
 
         mScreenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
     }
@@ -30,18 +30,6 @@ public class ScreenFilterView extends WindowView {
     @Override
     protected int getContentLayoutResId() {
         return R.layout.view_screen_filter;
-    }
-
-    @Override
-    public WindowManager.LayoutParams getWindowLayoutParams() {
-        return new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                //0,
-                //0,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                PixelFormat.TRANSLUCENT);
     }
 
     /**

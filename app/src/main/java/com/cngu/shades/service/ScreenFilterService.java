@@ -1,15 +1,21 @@
 package com.cngu.shades.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.WindowManager;
 
 import com.cngu.shades.helpers.FilterCommandParser;
+import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.presenter.ScreenFilterPresenter;
 import com.cngu.shades.view.ScreenFilterView;
@@ -33,8 +39,14 @@ public class ScreenFilterService extends Service {
             new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            int changedValue = sharedPreferences.getInt(key, -1);
-            Log.d(TAG, "Pref " + key + " changed to " + changedValue);
+
+            try {
+                int changedValue = sharedPreferences.getInt(key, -1);
+                Log.d(TAG, "Pref " + key + " changed to " + changedValue);
+            } catch (ClassCastException cce) {
+                boolean changedValue = sharedPreferences.getBoolean(key, false);
+                Log.d(TAG, "Pref " + key + " changed to " + changedValue);
+            }
         }
     };
 
@@ -50,9 +62,10 @@ public class ScreenFilterService extends Service {
 
         ScreenFilterView view = new ScreenFilterView(context);
         WindowViewManager windowViewManager = new WindowViewManager(windowManager);
-        FilterCommandParser filterCommandParser = new FilterCommandParser();
+        ScreenManager screenManager = new ScreenManager(this, windowManager);
+        FilterCommandParser commandParser = new FilterCommandParser();
 
-        mPresenter = new ScreenFilterPresenter(view, windowViewManager, filterCommandParser);
+        mPresenter = new ScreenFilterPresenter(view, windowViewManager, screenManager, commandParser);
     }
 
     // TODO: Wrap this in a SettingsManager
@@ -66,6 +79,11 @@ public class ScreenFilterService extends Service {
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
 
         mPresenter.onScreenFilterCommand(intent);
+
+        // TODO: Clean up. Probably move into Presenter and register if ON, and unregister if OFF.
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
+        this.registerReceiver(mBroadcastReceiver, filter);
 
         // Do not attempt to restart if the hosting process is killed by Android
         return START_NOT_STICKY;
@@ -85,4 +103,37 @@ public class ScreenFilterService extends Service {
 
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener);
     }
+
+
+
+
+
+    public BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent myIntent) {
+
+            if ( myIntent.getAction().equals( Intent.ACTION_CONFIGURATION_CHANGED ) ) {
+
+                Log.d(TAG, "received->" + Intent.ACTION_CONFIGURATION_CHANGED);
+
+
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    // it's Landscape
+                    Log.d(TAG, "LANDSCAPE");
+                }
+                else {
+                    Log.d(TAG, "PORTRAIT");
+                }
+
+                WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+                Display display = wm.getDefaultDisplay();
+                DisplayMetrics dm = new DisplayMetrics();
+                display.getRealMetrics(dm);
+
+                int finalHeight = dm.heightPixels;
+
+                Log.d(TAG, "Screen Filter height: " + finalHeight);
+            }
+        }
+    };
 }
