@@ -12,6 +12,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
     private SharedPreferences mSharedPreferences;
     private OnSettingsChangedListener mSettingsChangedListener;
 
+    private String mPowerStatePrefKey;
     private String mDimPrefKey;
     private String mColorPrefKey;
 
@@ -25,8 +26,17 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
 
         mSharedPreferences = sharedPreferences;
 
+        mPowerStatePrefKey = resources.getString(R.string.pref_key_shades_power_state);
         mDimPrefKey = resources.getString(R.string.pref_key_shades_dim_level);
         mColorPrefKey = resources.getString(R.string.pref_key_shades_color);
+    }
+
+    public boolean getShadesPowerState() {
+        return mSharedPreferences.getBoolean(mPowerStatePrefKey, false);
+    }
+
+    public void setShadesPowerState(boolean state) {
+        mSharedPreferences.edit().putBoolean(mPowerStatePrefKey, state).apply();
     }
 
     public int getShadesDimLevel() {

@@ -68,7 +68,6 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         mOffState = new OffState();
         mPauseState = new PauseState();
 
-        // TODO: What should the default state be?
         mState = mOffState;
     }
 
@@ -124,6 +123,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         if (!mScreenFilterOpen) {
             mWindowViewManager.openWindow(mView, createFilterLayoutParams());
             mScreenFilterOpen = true;
+            mSettingsModel.setShadesPowerState(true);
         }
     }
 
@@ -137,6 +137,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         if (mScreenFilterOpen) {
             mWindowViewManager.closeWindow(mView);
             mScreenFilterOpen = false;
+            mSettingsModel.setShadesPowerState(false);
         }
     }
 
@@ -162,7 +163,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     private class OnState extends State {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
-            if (commandFlag == ScreenFilterService.COMMAND_ON) {
+            if (commandFlag == ScreenFilterService.COMMAND_OFF) {
                 closeScreenFilter();
 
                 moveToState(mOffState);
