@@ -2,21 +2,24 @@ package com.cngu.shades.model;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.util.Log;
 
 import com.cngu.shades.R;
+import com.cngu.shades.preference.ColorPickerPreference;
+import com.cngu.shades.preference.DimSeekBarPreference;
 
 public class SettingsModel implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private Resources mResources;
     private OnSettingsChangedListener mSettingsChangedListener;
 
+    private String mDimPrefKey;
+    private String mColorPrefKey;
 
     public SettingsModel(Resources resources) {
         if (resources == null) {
             throw new IllegalArgumentException("resources cannot be null");
         }
 
-        mResources = resources;
+        mDimPrefKey = resources.getString(R.string.pref_key_shades_dim_level);
+        mColorPrefKey = resources.getString(R.string.pref_key_shades_color);
     }
 
     @Override
@@ -25,14 +28,14 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
             return;
         }
 
-        if (key.equals(mResources.getString(R.string.pref_key_shades_dim_level)))
+        if (key.equals(mDimPrefKey))
         {
-            int dimLevel = sharedPreferences.getInt(key, -1);
+            int dimLevel = sharedPreferences.getInt(key, DimSeekBarPreference.DEFAULT_VALUE);
             mSettingsChangedListener.onDimLevelChanged(dimLevel);
         }
-        else if (key.equals(mResources.getString(R.string.pref_key_shades_color)))
+        else if (key.equals(mColorPrefKey))
         {
-            int color = sharedPreferences.getInt(key, -1);
+            int color = sharedPreferences.getInt(key, ColorPickerPreference.DEFAULT_VALUE);
             mSettingsChangedListener.onColorChanged(color);
         }
     }

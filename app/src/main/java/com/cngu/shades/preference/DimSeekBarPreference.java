@@ -10,7 +10,7 @@ import android.widget.SeekBar;
 import com.cngu.shades.R;
 
 public class DimSeekBarPreference extends Preference {
-    private static final int DEFAULT_VALUE = 50;
+    public static final int DEFAULT_VALUE = 50;
 
     private SeekBar mDimLevelSeekBar;
     private int mDimLevel;

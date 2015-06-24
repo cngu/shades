@@ -14,7 +14,7 @@ import com.cngu.shades.widget.ColorPicker;
 public class ColorPickerPreference extends Preference {
 
     // Changes to DEFAULT_VALUE should be reflected in preferences.xml
-    private static final int DEFAULT_VALUE = 0xFF000000;
+    public static final int DEFAULT_VALUE = 0xFF000000;
 
     private ColorPicker mColorPicker;
     private ColorAdapter mColorAdapter;
