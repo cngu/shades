@@ -10,11 +10,13 @@ import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.model.SettingsModel;
+import com.cngu.shades.receiver.OrientationChangeReceiver;
 import com.cngu.shades.service.ScreenFilterService;
 import com.cngu.shades.service.ServiceLifeCycleController;
 import com.cngu.shades.view.ScreenFilterView;
 
-public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedListener {
+public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrientationChangeListener,
+                                              SettingsModel.OnSettingsChangedListener {
     private static final String TAG = "ScreenFilterPresenter";
     private static final boolean DEBUG = true;
 
@@ -87,6 +89,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     }
     //endregion
 
+    //region OnOrientationChangeListener
     public void onPortraitOrientation() {
         reLayoutScreenFilter();
     }
@@ -94,6 +97,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     public void onLandscapeOrientation() {
         reLayoutScreenFilter();
     }
+    //endregion
 
     private WindowManager.LayoutParams createFilterLayoutParams() {
         WindowManager.LayoutParams wlp = new WindowManager.LayoutParams(

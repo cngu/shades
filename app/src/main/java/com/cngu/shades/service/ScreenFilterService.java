@@ -1,13 +1,10 @@
 package com.cngu.shades.service;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -18,6 +15,7 @@ import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.presenter.ScreenFilterPresenter;
+import com.cngu.shades.receiver.OrientationChangeReceiver;
 import com.cngu.shades.view.ScreenFilterView;
 
 public class ScreenFilterService extends Service implements ServiceLifeCycleController {
@@ -36,7 +34,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     private ScreenFilterPresenter mPresenter;
     private SettingsModel mSettingsModel;
     private SharedPreferences mSharedPreferences;
-    private OrientationReceiver mOrientationReceiver;
+    private OrientationChangeReceiver mOrientationReceiver;
 
     @Override
     public void onCreate() {
@@ -102,27 +100,12 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
         IntentFilter orientationIntentFilter = new IntentFilter();
         orientationIntentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
 
-        mOrientationReceiver = new OrientationReceiver();
+        mOrientationReceiver = new OrientationChangeReceiver(this, mPresenter);
         registerReceiver(mOrientationReceiver, orientationIntentFilter);
     }
 
     private void unregisterOrientationReceiver() {
         unregisterReceiver(mOrientationReceiver);
         mOrientationReceiver = null;
-    }
-
-    private class OrientationReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
-                Resources r = getResources();
-                if(r.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                    mPresenter.onPortraitOrientation();
-                }
-                else {
-                    mPresenter.onLandscapeOrientation();
-                }
-            }
-        }
     }
 }
