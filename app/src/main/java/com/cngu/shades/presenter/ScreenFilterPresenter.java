@@ -30,7 +30,6 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     private State mOnState;
     private State mOffState;
     private State mPauseState;
-    private State mResumeState;
 
     public ScreenFilterPresenter(ScreenFilterView view, SettingsModel model,
                                  WindowViewManager windowViewManager, ScreenManager screenManager,
@@ -68,7 +67,6 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         mOnState = new OnState();
         mOffState = new OffState();
         mPauseState = new PauseState();
-        mResumeState = new ResumeState();
 
         // TODO: What should the default state be?
         mState = mOffState;
@@ -176,8 +174,9 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                mView.setFilterRgbColor(Color.BLACK);
-                mView.setFilterDimLevel(100);
+                mView.setFilterDimLevel(mSettingsModel.getShadesDimLevel());
+                mView.setFilterRgbColor(mSettingsModel.getShadesColor());
+
                 openScreenFilter();
 
                 moveToState(mOnState);
@@ -186,13 +185,6 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     }
 
     private class PauseState extends State {
-        @Override
-        protected void onScreenFilterCommand(int commandFlag) {
-
-        }
-    }
-
-    private class ResumeState extends State {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
 
