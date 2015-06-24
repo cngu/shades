@@ -57,7 +57,6 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         mScreenManager = screenManager;
         mFilterCommandParser = filterCommandParser;
 
-        mView.registerPresenter(this);
         mSettingsModel.setOnSettingsChangedListener(this);
 
         mScreenFilterOpen = false;
@@ -86,12 +85,12 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     //region OnSettingsChangedListener
     @Override
     public void onDimLevelChanged(int dimLevel) {
-        if (DEBUG) Log.d(TAG, "Dim level changed to: " + dimLevel);
+        mView.setFilterDimLevel(dimLevel);
     }
 
     @Override
     public void onColorChanged(int color) {
-        if (DEBUG) Log.d(TAG, "Color changed to: 0x" + Integer.toHexString(color));
+        mView.setFilterRgbColor(color);
     }
     //endregion
 
@@ -114,7 +113,8 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                    WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR,// |
+                    //WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 PixelFormat.TRANSLUCENT);
 
         wlp.gravity = Gravity.TOP | Gravity.START;
@@ -176,8 +176,8 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                mView.setFilterDimLevel(100);
                 mView.setFilterRgbColor(Color.BLACK);
+                mView.setFilterDimLevel(100);
                 openScreenFilter();
 
                 moveToState(mOnState);

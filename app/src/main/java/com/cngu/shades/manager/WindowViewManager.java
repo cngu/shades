@@ -1,12 +1,10 @@
 package com.cngu.shades.manager;
 
+import android.view.View;
 import android.view.WindowManager;
 
-import com.cngu.shades.view.WindowView;
-
 /**
- * Convenience class that wraps {@link WindowManager} and operates on properly-initialized
- * {@link WindowView}s rather than arbitrary {@link android.view.View}s.
+ * Convenience class that wraps {@link WindowManager} for dependency injection.
  */
 public class WindowViewManager {
 
@@ -21,7 +19,7 @@ public class WindowViewManager {
      * @param view the view to render in the new Window.
      * @param wlp the {@link android.view.WindowManager.LayoutParams} to use when laying out the window.
      */
-    public void openWindow(WindowView view, WindowManager.LayoutParams wlp) {
+    public void openWindow(View view, WindowManager.LayoutParams wlp) {
         mWindowManager.addView(view, wlp);
     }
 
@@ -32,7 +30,7 @@ public class WindowViewManager {
      * @param view the Window containing this view will have its LayoutParams set to {@code wlp}.
      * @param wlp the new LayoutParams to set on the Window.
      */
-    public void reLayoutWindow(WindowView view, WindowManager.LayoutParams wlp) {
+    public void reLayoutWindow(View view, WindowManager.LayoutParams wlp) {
         mWindowManager.updateViewLayout(view, wlp);
     }
 
@@ -40,7 +38,7 @@ public class WindowViewManager {
      * Closes the Window that is currently displaying {@code view}.
      * @param view the Window containing this view will be closed.
      */
-    public void closeWindow(WindowView view) {
+    public void closeWindow(View view) {
         mWindowManager.removeView(view);
     }
 }

@@ -1,35 +1,24 @@
 package com.cngu.shades.view;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.ImageView;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.view.View;
 
-import com.cngu.shades.R;
-import com.cngu.shades.presenter.ScreenFilterPresenter;
+import com.cngu.shades.preference.ColorPickerPreference;
 
-public class ScreenFilterView extends WindowView {
-    private static final String TAG = "ScreenFilterView";
-    private static final boolean DEBUG = true;
 
+public class ScreenFilterView extends View {
     private static final float MIN_DIM   = 0f;
     private static final float MAX_DIM   = 100f;
-    private static final float MIN_ALPHA = 0f;
-    private static final float MAX_ALPHA = 0.75f;
+    private static final float MIN_ALPHA = 0x00;
+    private static final float MAX_ALPHA = (int) (0xFF * 0.75);
 
-    private Context mContext;
-    private ScreenFilterPresenter mPresenter;
-    private ImageView mScreenFilter;
+    private int mAlpha = (int) (MAX_ALPHA - MIN_ALPHA)/2;
+    private int mColor = ColorPickerPreference.DEFAULT_VALUE;
 
     public ScreenFilterView(Context context) {
         super(context);
-        mContext = context;
-
-        mScreenFilter = (ImageView) findViewById(R.id.screen_filter_imageview);
-    }
-
-    @Override
-    protected int getContentLayoutResId() {
-        return R.layout.view_screen_filter;
     }
 
     /**
@@ -40,14 +29,8 @@ public class ScreenFilterView extends WindowView {
      *                 never be fully opaque.
      */
     public void setFilterDimLevel(int dimLevel) {
-        float alpha = mapToRange((float) dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
-
-        if (mScreenFilter != null) {
-            mScreenFilter.setAlpha(alpha);
-        }
-        if (DEBUG) {
-            Log.i(TAG, String.format("Set filter alpha to: %.2f", alpha));
-        }
+        mAlpha = (int) mapToRange((float) dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
+        invalidate();
     }
 
     /**
@@ -57,26 +40,13 @@ public class ScreenFilterView extends WindowView {
      *              in {@link android.graphics.Color}, but the alpha byte is ignored.
      */
     public void setFilterRgbColor(int color) {
-        int rgbColor = stripAlpha(color);
-
-        if (mScreenFilter != null) {
-            mScreenFilter.setBackgroundColor(rgbColor);
-        }
-
-        if (DEBUG) Log.i(TAG, String.format("Set filter RGB to 0x%s", Integer.toHexString(rgbColor)));
+        mColor = color;
+        invalidate();
     }
 
-    public void registerPresenter(ScreenFilterPresenter presenter) {
-        if (presenter == null) {
-            throw new IllegalArgumentException("presenter cannot be null");
-        }
-        mPresenter = presenter;
-
-        if (DEBUG) Log.i(TAG, "Registered Presenter");
-    }
-
-    private int stripAlpha(int color) {
-        return color | 0xFF000000;
+    @Override
+    protected void onDraw(Canvas canvas) {
+        canvas.drawColor(Color.argb(mAlpha, Color.red(mColor), Color.green(mColor), Color.blue(mColor)));
     }
 
     private float mapToRange(float value, float minInput, float maxInput,

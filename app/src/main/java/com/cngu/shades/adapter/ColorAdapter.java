@@ -35,20 +35,18 @@ public class ColorAdapter extends BaseAdapter {
     }
 
     private void initColorsList(Resources resources) {
-        if (COLORS == null) {
-            COLORS = new int[] {
-                    resources.getColor(android.R.color.black),
-                    resources.getColor(R.color.red_500),
-                    resources.getColor(R.color.amber_500),
-                    resources.getColor(R.color.indigo_500),
-                    resources.getColor(R.color.green_500),
-                    resources.getColor(R.color.blue_grey_500),
-                    resources.getColor(R.color.pink_500),
-                    resources.getColor(R.color.deep_orange_500),
-                    resources.getColor(R.color.deep_purple_500),
-                    resources.getColor(R.color.teal_500)
-            };
-        }
+        COLORS = new int[] {
+                resources.getColor(android.R.color.black),
+                resources.getColor(R.color.red_500),
+                resources.getColor(R.color.amber_500),
+                resources.getColor(R.color.indigo_500),
+                resources.getColor(R.color.green_500),
+                resources.getColor(R.color.blue_grey_500),
+                resources.getColor(R.color.pink_500),
+                resources.getColor(R.color.deep_orange_500),
+                resources.getColor(R.color.deep_purple_500),
+                resources.getColor(R.color.teal_500)
+        };
     }
 
     public void setSelectedPosition(int position) {
