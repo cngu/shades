@@ -1,6 +1,7 @@
 package com.cngu.shades.manager;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -15,14 +16,21 @@ public class ScreenManager {
     private static final int DEFAULT_NAV_BAR_HEIGHT_DP = 48;
     private static final int DEFAULT_STATUS_BAR_HEIGHT_DP = 25;
 
-    private Context mContext;
+    private Resources mResources;
     private WindowManager mWindowManager;
 
     private int mStatusBarHeight = -1;
     private int mNavigationBarHeight = -1;
 
     public ScreenManager(Context context, WindowManager windowManager) {
-        mContext = context;
+        if (context == null) {
+            throw new IllegalArgumentException("context cannot be null");
+        }
+        if (windowManager == null) {
+            throw new IllegalArgumentException("windowManager cannot be null");
+        }
+
+        mResources = context.getResources();
         mWindowManager = windowManager;
     }
 
@@ -31,16 +39,21 @@ public class ScreenManager {
         DisplayMetrics dm = new DisplayMetrics();
         display.getRealMetrics(dm);
 
-        return dm.heightPixels + getStatusBarHeightPx() + getNavigationBarHeightPx();
+        int screenHeight = dm.heightPixels + getStatusBarHeightPx();
+
+        if (inPortrait()) {
+            screenHeight += getNavigationBarHeightPx();
+        }
+
+        return screenHeight;
     }
 
     public int getStatusBarHeightPx() {
         if (mStatusBarHeight == -1) {
-            Resources r = mContext.getResources();
-            int statusBarHeightId = r.getIdentifier("status_bar_height", "dimen", "android");
+            int statusBarHeightId = mResources.getIdentifier("status_bar_height", "dimen", "android");
 
             if (statusBarHeightId > 0) {
-                mStatusBarHeight = r.getDimensionPixelSize(statusBarHeightId);
+                mStatusBarHeight = mResources.getDimensionPixelSize(statusBarHeightId);
                 if (DEBUG) Log.i(TAG, "Found Status Bar Height: " + mStatusBarHeight);
             } else {
                 mStatusBarHeight = (int) dpToPx(DEFAULT_STATUS_BAR_HEIGHT_DP);
@@ -53,11 +66,10 @@ public class ScreenManager {
 
     public int getNavigationBarHeightPx() {
         if (mNavigationBarHeight == -1) {
-            Resources r = mContext.getResources();
-            int navBarHeightId = r.getIdentifier("navigation_bar_height", "dimen", "android");
+            int navBarHeightId = mResources.getIdentifier("navigation_bar_height", "dimen", "android");
 
             if (navBarHeightId > 0) {
-                mNavigationBarHeight = r.getDimensionPixelSize(navBarHeightId);
+                mNavigationBarHeight = mResources.getDimensionPixelSize(navBarHeightId);
                 if (DEBUG) Log.i(TAG, "Found Navigation Bar Height: " + mNavigationBarHeight);
             } else {
                 mNavigationBarHeight = (int) dpToPx(DEFAULT_NAV_BAR_HEIGHT_DP);
@@ -69,7 +81,10 @@ public class ScreenManager {
     }
 
     private float dpToPx(float dp) {
-        Resources r = mContext.getResources();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, mResources.getDisplayMetrics());
+    }
+
+    private boolean inPortrait() {
+        return mResources.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
 }

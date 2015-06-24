@@ -1,4 +1,4 @@
-package com.cngu.shades.helpers;
+package com.cngu.shades.helper;
 
 import android.content.Intent;
 

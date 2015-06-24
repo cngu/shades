@@ -12,7 +12,8 @@ public class WindowViewManager {
 
     private WindowManager mWindowManager;
 
-    public WindowViewManager(WindowManager windowManager) { mWindowManager = windowManager;
+    public WindowViewManager(WindowManager windowManager) {
+        mWindowManager = windowManager;
     }
 
     /**

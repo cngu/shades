@@ -7,14 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.WindowManager;
 
-import com.cngu.shades.helpers.FilterCommandParser;
+import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.presenter.ScreenFilterPresenter;
@@ -34,6 +33,7 @@ public class ScreenFilterService extends Service {
     private static final boolean DEBUG = true;
 
     private ScreenFilterPresenter mPresenter;
+    private OrientationReceiver mOrientationReceiver;
 
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefListener =
             new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -66,9 +66,11 @@ public class ScreenFilterService extends Service {
         FilterCommandParser commandParser = new FilterCommandParser();
 
         mPresenter = new ScreenFilterPresenter(view, windowViewManager, screenManager, commandParser);
+
+        registerOrientationReceiver();
     }
 
-    // TODO: Wrap this in a SettingsManager
+    // TODO: Wrap this in a SettingsModel
     SharedPreferences mSharedPreferences;
 
     @Override
@@ -79,11 +81,6 @@ public class ScreenFilterService extends Service {
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
 
         mPresenter.onScreenFilterCommand(intent);
-
-        // TODO: Clean up. Probably move into Presenter and register if ON, and unregister if OFF.
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
-        this.registerReceiver(mBroadcastReceiver, filter);
 
         // Do not attempt to restart if the hosting process is killed by Android
         return START_NOT_STICKY;
@@ -97,43 +94,43 @@ public class ScreenFilterService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         if (DEBUG) Log.i(TAG, "onDestroy");
 
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener);
+        unregisterOrientationReceiver();
+
+        super.onDestroy();
     }
 
+    private void registerOrientationReceiver() {
+        if (mOrientationReceiver != null) {
+            return;
+        }
 
+        IntentFilter orientationIntentFilter = new IntentFilter();
+        orientationIntentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
 
+        mOrientationReceiver = new OrientationReceiver();
+        registerReceiver(mOrientationReceiver, orientationIntentFilter);
+    }
 
+    private void unregisterOrientationReceiver() {
+        unregisterReceiver(mOrientationReceiver);
+        mOrientationReceiver = null;
+    }
 
-    public BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    private class OrientationReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent myIntent) {
-
-            if ( myIntent.getAction().equals( Intent.ACTION_CONFIGURATION_CHANGED ) ) {
-
-                Log.d(TAG, "received->" + Intent.ACTION_CONFIGURATION_CHANGED);
-
-
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    // it's Landscape
-                    Log.d(TAG, "LANDSCAPE");
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
+                Resources r = getResources();
+                if(r.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                    mPresenter.onPortraitOrientation();
                 }
                 else {
-                    Log.d(TAG, "PORTRAIT");
+                    mPresenter.onLandscapeOrientation();
                 }
-
-                WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-                Display display = wm.getDefaultDisplay();
-                DisplayMetrics dm = new DisplayMetrics();
-                display.getRealMetrics(dm);
-
-                int finalHeight = dm.heightPixels;
-
-                Log.d(TAG, "Screen Filter height: " + finalHeight);
             }
         }
-    };
+    }
 }

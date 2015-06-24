@@ -7,8 +7,8 @@ import android.util.Log;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
-import com.cngu.shades.helpers.FilterCommandFactory;
-import com.cngu.shades.helpers.FilterCommandSender;
+import com.cngu.shades.helper.FilterCommandFactory;
+import com.cngu.shades.helper.FilterCommandSender;
 import com.cngu.shades.presenter.ShadesPresenter;
 
 public class ShadesActivity extends AppCompatActivity {

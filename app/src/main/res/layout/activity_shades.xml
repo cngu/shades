@@ -37,6 +37,11 @@
         app:fabSize="normal"
         app:borderWidth="0dp" />
 
+    <EditText
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"/>
+
 </FrameLayout>
 
 

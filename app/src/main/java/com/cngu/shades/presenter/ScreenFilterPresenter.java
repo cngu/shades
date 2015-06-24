@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import com.cngu.shades.helpers.FilterCommandParser;
+import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.service.ScreenFilterService;
@@ -21,6 +21,8 @@ public class ScreenFilterPresenter {
     private WindowViewManager mWindowViewManager;
     private ScreenManager mScreenManager;
     private FilterCommandParser mFilterCommandParser;
+
+    private boolean mScreenFilterOpen;
 
     private State mState;
     private State mOnState;
@@ -50,6 +52,8 @@ public class ScreenFilterPresenter {
 
         mView.registerPresenter(this);
 
+        mScreenFilterOpen = false;
+
         initializeStates();
     }
 
@@ -66,11 +70,17 @@ public class ScreenFilterPresenter {
     public void onScreenFilterCommand(Intent command) {
         int commandFlag = mFilterCommandParser.parseCommandFlag(command);
 
-        if (DEBUG) {
-            Log.i(TAG, String.format("Handling command: %d in current state: %s", commandFlag, mState));
-        }
+        if (DEBUG) Log.i(TAG, String.format("Handling command: %d in current state: %s", commandFlag, mState));
 
         mState.onScreenFilterCommand(commandFlag);
+    }
+
+    public void onPortraitOrientation() {
+        reLayoutScreenFilter();
+    }
+
+    public void onLandscapeOrientation() {
+        reLayoutScreenFilter();
     }
 
     private WindowManager.LayoutParams createFilterLayoutParams() {
@@ -90,6 +100,26 @@ public class ScreenFilterPresenter {
         wlp.gravity = Gravity.TOP | Gravity.LEFT;
 
         return wlp;
+    }
+
+    private void openScreenFilter() {
+        if (!mScreenFilterOpen) {
+            mWindowViewManager.openWindow(mView, createFilterLayoutParams());
+            mScreenFilterOpen = true;
+        }
+    }
+
+    private void reLayoutScreenFilter() {
+        if (mScreenFilterOpen) {
+            mWindowViewManager.reLayoutWindow(mView, createFilterLayoutParams());
+        }
+    }
+
+    private void closeScreenFilter() {
+        if (mScreenFilterOpen) {
+            mWindowViewManager.closeWindow(mView);
+            mScreenFilterOpen = false;
+        }
     }
 
     private void moveToState(State newState) {
@@ -116,7 +146,8 @@ public class ScreenFilterPresenter {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                mWindowViewManager.closeWindow(mView);
+                closeScreenFilter();
+
                 moveToState(mOffState);
             }
         }
@@ -128,7 +159,8 @@ public class ScreenFilterPresenter {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
                 mView.setFilterDimLevel(100);
                 mView.setFilterRgbColor(Color.BLACK);
-                mWindowViewManager.openWindow(mView, createFilterLayoutParams());
+                openScreenFilter();
+
                 moveToState(mOnState);
             }
         }
