@@ -113,8 +113,8 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                    WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR,// |
-                    //WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
+                    WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 PixelFormat.TRANSLUCENT);
 
         wlp.gravity = Gravity.TOP | Gravity.START;
