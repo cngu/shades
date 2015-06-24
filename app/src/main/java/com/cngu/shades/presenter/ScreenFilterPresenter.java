@@ -10,14 +10,16 @@ import android.view.WindowManager;
 import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
+import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.service.ScreenFilterService;
 import com.cngu.shades.view.ScreenFilterView;
 
-public class ScreenFilterPresenter {
+public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedListener {
     private static final String TAG = "ScreenFilterPresenter";
     private static final boolean DEBUG = true;
 
     private ScreenFilterView mView;
+    private SettingsModel mSettingsModel;
     private WindowViewManager mWindowViewManager;
     private ScreenManager mScreenManager;
     private FilterCommandParser mFilterCommandParser;
@@ -30,10 +32,14 @@ public class ScreenFilterPresenter {
     private State mPauseState;
     private State mResumeState;
 
-    public ScreenFilterPresenter(ScreenFilterView view, WindowViewManager windowViewManager,
-                                 ScreenManager screenManager, FilterCommandParser filterCommandParser) {
+    public ScreenFilterPresenter(ScreenFilterView view, SettingsModel model,
+                                 WindowViewManager windowViewManager, ScreenManager screenManager,
+                                 FilterCommandParser filterCommandParser) {
         if (view == null) {
             throw new IllegalArgumentException("view cannot be null");
+        }
+        if (model == null) {
+            throw new IllegalArgumentException("model cannot be null");
         }
         if (windowViewManager == null) {
             throw new IllegalArgumentException("windowViewManager cannot be null");
@@ -46,11 +52,13 @@ public class ScreenFilterPresenter {
         }
 
         mView = view;
+        mSettingsModel = model;
         mWindowViewManager = windowViewManager;
         mScreenManager = screenManager;
         mFilterCommandParser = filterCommandParser;
 
         mView.registerPresenter(this);
+        mSettingsModel.setOnSettingsChangedListener(this);
 
         mScreenFilterOpen = false;
 
@@ -75,6 +83,18 @@ public class ScreenFilterPresenter {
         mState.onScreenFilterCommand(commandFlag);
     }
 
+    //region OnSettingsChangedListener
+    @Override
+    public void onDimLevelChanged(int dimLevel) {
+        if (DEBUG) Log.d(TAG, "Dim level changed to: " + dimLevel);
+    }
+
+    @Override
+    public void onColorChanged(int color) {
+        if (DEBUG) Log.d(TAG, "Color changed to: 0x" + Integer.toHexString(color));
+    }
+    //endregion
+
     public void onPortraitOrientation() {
         reLayoutScreenFilter();
     }
@@ -97,7 +117,7 @@ public class ScreenFilterPresenter {
                     WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR,
                 PixelFormat.TRANSLUCENT);
 
-        wlp.gravity = Gravity.TOP | Gravity.LEFT;
+        wlp.gravity = Gravity.TOP | Gravity.START;
 
         return wlp;
     }
@@ -133,7 +153,6 @@ public class ScreenFilterPresenter {
     }
 
     private abstract class State {
-
         protected abstract void onScreenFilterCommand(int commandFlag);
 
         @Override

@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
+import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.presenter.ScreenFilterPresenter;
 import com.cngu.shades.view.ScreenFilterView;
 
@@ -33,22 +34,9 @@ public class ScreenFilterService extends Service {
     private static final boolean DEBUG = true;
 
     private ScreenFilterPresenter mPresenter;
+    private SettingsModel mSettingsModel;
+    private SharedPreferences mSharedPreferences;
     private OrientationReceiver mOrientationReceiver;
-
-    private SharedPreferences.OnSharedPreferenceChangeListener mSharedPrefListener =
-            new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-            try {
-                int changedValue = sharedPreferences.getInt(key, -1);
-                Log.d(TAG, "Pref " + key + " changed to " + changedValue);
-            } catch (ClassCastException cce) {
-                boolean changedValue = sharedPreferences.getBoolean(key, false);
-                Log.d(TAG, "Pref " + key + " changed to " + changedValue);
-            }
-        }
-    };
 
     @Override
     public void onCreate() {
@@ -61,24 +49,22 @@ public class ScreenFilterService extends Service {
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
         ScreenFilterView view = new ScreenFilterView(context);
-        WindowViewManager windowViewManager = new WindowViewManager(windowManager);
-        ScreenManager screenManager = new ScreenManager(this, windowManager);
-        FilterCommandParser commandParser = new FilterCommandParser();
+        WindowViewManager wvm = new WindowViewManager(windowManager);
+        ScreenManager sm = new ScreenManager(this, windowManager);
+        FilterCommandParser fcp = new FilterCommandParser();
 
-        mPresenter = new ScreenFilterPresenter(view, windowViewManager, screenManager, commandParser);
+        mSettingsModel = new SettingsModel(context.getResources());
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSettingsModel);
+
+        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, wvm, sm, fcp);
 
         registerOrientationReceiver();
     }
 
-    // TODO: Wrap this in a SettingsModel
-    SharedPreferences mSharedPreferences;
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (DEBUG) Log.i(TAG, String.format("onStartCommand(%s, %d, %d", intent, flags, startId));
-
-        mSharedPreferences= PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPrefListener);
 
         mPresenter.onScreenFilterCommand(intent);
 
@@ -96,7 +82,7 @@ public class ScreenFilterService extends Service {
     public void onDestroy() {
         if (DEBUG) Log.i(TAG, "onDestroy");
 
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPrefListener);
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSettingsModel);
         unregisterOrientationReceiver();
 
         super.onDestroy();
