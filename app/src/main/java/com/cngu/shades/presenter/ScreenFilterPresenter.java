@@ -1,7 +1,6 @@
 package com.cngu.shades.presenter;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.Gravity;
@@ -12,6 +11,7 @@ import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
 import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.service.ScreenFilterService;
+import com.cngu.shades.service.ServiceLifeCycleController;
 import com.cngu.shades.view.ScreenFilterView;
 
 public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedListener {
@@ -20,18 +20,20 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
 
     private ScreenFilterView mView;
     private SettingsModel mSettingsModel;
+    private ServiceLifeCycleController mServiceController;
     private WindowViewManager mWindowViewManager;
     private ScreenManager mScreenManager;
     private FilterCommandParser mFilterCommandParser;
 
-    private boolean mScreenFilterOpen;
+    private boolean mScreenFilterOpen = false;
 
-    private State mState;
-    private State mOnState;
-    private State mOffState;
-    private State mPauseState;
+    private final State mOnState = new OnState();
+    private final State mOffState = new OffState();
+    private final State mPauseState = new PauseState();
+    private State mCurrentState = mOffState;
 
     public ScreenFilterPresenter(ScreenFilterView view, SettingsModel model,
+                                 ServiceLifeCycleController serviceController,
                                  WindowViewManager windowViewManager, ScreenManager screenManager,
                                  FilterCommandParser filterCommandParser) {
         if (view == null) {
@@ -39,6 +41,9 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
         }
         if (model == null) {
             throw new IllegalArgumentException("model cannot be null");
+        }
+        if (serviceController == null) {
+            throw new IllegalArgumentException("serviceController cannot be null");
         }
         if (windowViewManager == null) {
             throw new IllegalArgumentException("windowViewManager cannot be null");
@@ -52,31 +57,21 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
 
         mView = view;
         mSettingsModel = model;
+        mServiceController = serviceController;
         mWindowViewManager = windowViewManager;
         mScreenManager = screenManager;
         mFilterCommandParser = filterCommandParser;
 
         mSettingsModel.setOnSettingsChangedListener(this);
-
-        mScreenFilterOpen = false;
-
-        initializeStates();
-    }
-
-    private void initializeStates() {
-        mOnState = new OnState();
-        mOffState = new OffState();
-        mPauseState = new PauseState();
-
-        mState = mOffState;
     }
 
     public void onScreenFilterCommand(Intent command) {
         int commandFlag = mFilterCommandParser.parseCommandFlag(command);
 
-        if (DEBUG) Log.i(TAG, String.format("Handling command: %d in current state: %s", commandFlag, mState));
+        if (DEBUG) Log.i(TAG, String.format("Handling command: %d in current state: %s",
+                commandFlag, mCurrentState));
 
-        mState.onScreenFilterCommand(commandFlag);
+        mCurrentState.onScreenFilterCommand(commandFlag);
     }
 
     //region OnSettingsChangedListener
@@ -87,6 +82,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
 
     @Override
     public void onShadesColorChanged(int color) {
+        Log.d(TAG, "SHADES COLOR CHANGED: " + color);
         mView.setFilterRgbColor(color);
     }
     //endregion
@@ -146,9 +142,13 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
             throw new IllegalArgumentException("newState cannot be null");
         }
 
-        if (DEBUG) Log.i(TAG, String.format("Transitioning state from %s to %s", mState, newState));
+        if (DEBUG) Log.i(TAG, String.format("Transitioning state from %s to %s", mCurrentState, newState));
 
-        mState = newState;
+        mCurrentState = newState;
+
+        if (mCurrentState == mOffState) {
+            mServiceController.stop();
+        }
     }
 
     private abstract class State {
@@ -163,7 +163,7 @@ public class ScreenFilterPresenter implements SettingsModel.OnSettingsChangedLis
     private class OnState extends State {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
-            if (commandFlag == ScreenFilterService.COMMAND_OFF) {
+            if (commandFlag == ScreenFilterService.COMMAND_ON) {
                 closeScreenFilter();
 
                 moveToState(mOffState);

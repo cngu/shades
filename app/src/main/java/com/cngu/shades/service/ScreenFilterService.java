@@ -20,7 +20,7 @@ import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.presenter.ScreenFilterPresenter;
 import com.cngu.shades.view.ScreenFilterView;
 
-public class ScreenFilterService extends Service {
+public class ScreenFilterService extends Service implements ServiceLifeCycleController {
     public static final int VALID_COMMAND_START = 0;
     public static final int COMMAND_ON = 0;
     public static final int COMMAND_OFF = 1;
@@ -57,7 +57,7 @@ public class ScreenFilterService extends Service {
         mSettingsModel = new SettingsModel(context.getResources(), mSharedPreferences);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(mSettingsModel);
 
-        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, wvm, sm, fcp);
+        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, this, wvm, sm, fcp);
 
         registerOrientationReceiver();
     }
@@ -86,6 +86,12 @@ public class ScreenFilterService extends Service {
         unregisterOrientationReceiver();
 
         super.onDestroy();
+    }
+
+    @Override
+    public void stop() {
+        if (DEBUG) Log.i(TAG, "Received stop request");
+        stopSelf();
     }
 
     private void registerOrientationReceiver() {
