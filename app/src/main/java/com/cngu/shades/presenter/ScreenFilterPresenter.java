@@ -1,11 +1,14 @@
 package com.cngu.shades.presenter;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import com.cngu.shades.helper.AbstractAnimatorListener;
 import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
@@ -20,6 +23,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private static final String TAG = "ScreenFilterPresenter";
     private static final boolean DEBUG = true;
 
+    private static final int FADE_DURATION_MS = 3000;
+
     private ScreenFilterView mView;
     private SettingsModel mSettingsModel;
     private ServiceLifeCycleController mServiceController;
@@ -28,6 +33,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private FilterCommandParser mFilterCommandParser;
 
     private boolean mScreenFilterOpen = false;
+
+    private ValueAnimator mDimAnimator;
 
     private final State mOnState = new OnState();
     private final State mOffState = new OffState();
@@ -80,12 +87,38 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     @Override
     public void onShadesDimLevelChanged(int dimLevel) {
+        if (mDimAnimator.isRunning()) {
+            mDimAnimator.cancel();
+        }
         mView.setFilterDimLevel(dimLevel);
     }
 
     @Override
     public void onShadesColorChanged(int color) {
-        mView.setFilterRgbColor(color);
+        animateShadesColor(color);
+    }
+
+    private void animateShadesColor(int toColor) {
+        mView.setFilterRgbColor(toColor);
+    }
+
+    private void animateDimLevel(int toDimLevel, Animator.AnimatorListener listener) {
+        int fromDimLevel = mView.getDimLevel();
+
+        mDimAnimator = ValueAnimator.ofInt(fromDimLevel, toDimLevel);
+        mDimAnimator.setDuration(FADE_DURATION_MS);
+        mDimAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                mView.setFilterDimLevel((Integer) valueAnimator.getAnimatedValue());
+            }
+        });
+
+        if (listener != null) {
+            mDimAnimator.addListener(listener);
+        }
+
+        mDimAnimator.start();
     }
     //endregion
 
@@ -120,27 +153,59 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     }
 
     private void openScreenFilter() {
-        if (!mScreenFilterOpen) {
-            mWindowViewManager.openWindow(mView, createFilterLayoutParams());
-            mScreenFilterOpen = true;
-
-            mSettingsModel.setShadesPowerState(true);
+        if (mScreenFilterOpen) {
+            return;
         }
+
+        // Initialize filter to the saved color, but at 0 dim level (0 alpha, i.e. transparent)
+        int fromDim = (int) ScreenFilterView.MIN_DIM;
+        int toDim = mSettingsModel.getShadesDimLevel();
+
+        mView.setFilterDimLevel(fromDim);
+        mView.setFilterRgbColor(mSettingsModel.getShadesColor());
+
+        // Display the transparent filter
+        mWindowViewManager.openWindow(mView, createFilterLayoutParams());
+        mScreenFilterOpen = true;
+
+        // Animate the dim level to the saved value to achieve a fade-in effect
+        animateDimLevel(toDim, new AbstractAnimatorListener() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                // Set power state to ON once the fade-in animation is complete
+                mSettingsModel.setShadesPowerState(true);
+            }
+        });
     }
 
     private void reLayoutScreenFilter() {
-        if (mScreenFilterOpen) {
-            mWindowViewManager.reLayoutWindow(mView, createFilterLayoutParams());
+        if (!mScreenFilterOpen) {
+            return;
         }
+        mWindowViewManager.reLayoutWindow(mView, createFilterLayoutParams());
     }
 
-    private void closeScreenFilter() {
-        if (mScreenFilterOpen) {
-            mWindowViewManager.closeWindow(mView);
-            mScreenFilterOpen = false;
-
-            mSettingsModel.setShadesPowerState(false);
+    private void closeScreenFilter(final OnScreenFilterClosedListener listener) {
+        if (!mScreenFilterOpen) {
+            return;
         }
+
+        // Animate the dim level out to achieve a fade-out effect
+        animateDimLevel((int) ScreenFilterView.MIN_DIM, new AbstractAnimatorListener() {
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                // Close the window once the fade-out animation is complete
+                mWindowViewManager.closeWindow(mView);
+                mScreenFilterOpen = false;
+
+                // Set power state to OFF once the fade-out animation is complete
+                mSettingsModel.setShadesPowerState(false);
+
+                if (listener != null) {
+                    listener.onClosed();
+                }
+            }
+        });
     }
 
     private void moveToState(State newState) {
@@ -169,9 +234,13 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                closeScreenFilter();
-
-                moveToState(mOffState);
+                // Only transition to OffState AFTER the screen filter is fully closed
+                closeScreenFilter(new OnScreenFilterClosedListener() {
+                    @Override
+                    public void onClosed() {
+                        moveToState(mOffState);
+                    }
+                });
             }
         }
     }
@@ -180,9 +249,6 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
             if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                mView.setFilterDimLevel(mSettingsModel.getShadesDimLevel());
-                mView.setFilterRgbColor(mSettingsModel.getShadesColor());
-
                 openScreenFilter();
 
                 moveToState(mOnState);
@@ -195,5 +261,9 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         protected void onScreenFilterCommand(int commandFlag) {
 
         }
+    }
+
+    private interface OnScreenFilterClosedListener {
+        void onClosed();
     }
 }
