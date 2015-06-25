@@ -71,6 +71,14 @@ public class ShadesFragment extends PreferenceFragment {
                     prefFragListView.setClipToPadding(false);
                     prefFragListView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
                     prefFragListView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+
+                    // Reduce the padding on the fab
+                    float paddingFactor = 0.75f;
+                    paddingLeft = (int) (mShadesFab.getPaddingLeft() * paddingFactor);
+                    paddingTop = (int) (mShadesFab.getPaddingTop() * paddingFactor);
+                    paddingRight = (int) (mShadesFab.getPaddingRight() * paddingFactor);
+                    paddingBottom = (int) (mShadesFab.getPaddingBottom() * paddingFactor);
+                    mShadesFab.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
                 }
             });
         }

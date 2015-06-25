@@ -48,9 +48,9 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     private void setShadesFabIcon(boolean poweredOn, boolean pauseState) {
         int iconResId;
         if (!poweredOn || pauseState) {
-            iconResId = R.drawable.ic_shades;
+            iconResId = R.drawable.ic_shades_on;
         } else {
-            iconResId = R.drawable.ic_brightness;
+            iconResId = R.drawable.ic_shades_off;
         }
 
         mView.setShadesFabIcon(iconResId);

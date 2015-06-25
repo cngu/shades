@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -95,19 +96,22 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
         Context c = mView.getContext();
 
+        String title = c.getString(R.string.app_name);
+        int color = c.getResources().getColor(R.color.color_primary);
+
+        int smallIconResId;
         String contentText;
-        String subText;
         String pauseOrResumeTitle;
         int pauseOrResumeDrawableResId;
 
         if (isPaused()) {
+            smallIconResId = R.drawable.ic_shades_off_white;
             contentText = c.getString(R.string.paused);
-            subText = c.getString(R.string.paused);
             pauseOrResumeTitle = c.getString(R.string.action_start);
             pauseOrResumeDrawableResId = R.drawable.ic_play_arrow;
         } else {
+            smallIconResId = R.drawable.ic_shades_on_white;
             contentText = c.getString(R.string.running);
-            subText = c.getString(R.string.running);
             pauseOrResumeTitle = c.getString(R.string.action_pause);
             pauseOrResumeDrawableResId = R.drawable.ic_pause;
         }
@@ -125,15 +129,13 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         PendingIntent pauseOrResumePI = PendingIntent.getService(c, REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID,
                 pauseOrResumeCommand, PendingIntent.FLAG_ONE_SHOT);
 
-        Bitmap notificationIcon = BitmapFactory.decodeResource(c.getResources(), R.mipmap.ic_launcher);
-        mNotificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
-                            .setLargeIcon(notificationIcon)
-                            .setContentTitle(c.getString(R.string.app_name))
+        mNotificationBuilder.setSmallIcon(smallIconResId)
+                            .setContentTitle(title)
                             .setContentText(contentText)
-                            .setSubText(subText)
+                            .setColor(color)
                             .addAction(R.drawable.ic_stop, c.getString(R.string.action_stop), stopPI)
-                            .addAction(pauseOrResumeDrawableResId, pauseOrResumeTitle, pauseOrResumePI);
-                            //.setPriority(Notification.PRIORITY_MIN);
+                            .addAction(pauseOrResumeDrawableResId, pauseOrResumeTitle, pauseOrResumePI)
+                            .setPriority(Notification.PRIORITY_MIN);
 
         mServiceController.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
     }

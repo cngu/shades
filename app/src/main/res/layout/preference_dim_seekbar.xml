@@ -31,7 +31,7 @@
                 android:layout_gravity="center_vertical|start"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/ic_shades" />
+                android:src="@drawable/ic_shades_on" />
 
             <SeekBar
                 android:id="@+id/dim_level_seekbar"

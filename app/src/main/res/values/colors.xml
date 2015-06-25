@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Theme Colors -->
-    <color name="color_primary">@color/blue_grey_800</color>
-    <color name="color_primary_dark">@color/blue_grey_900</color>
+    <color name="color_primary">#FFFEBD0C</color>
+    <color name="color_primary_dark">#F99F00</color>
 
     <!-- Widgets -->
-    <color name="fab_background_tint">@android:color/white</color>
-    <color name="fab_icon_tint">@color/grey_700</color>
+    <color name="fab_background_tint">@color/color_primary</color>
+    <color name="fab_icon_tint">@android:color/black</color>
 </resources>
