@@ -98,29 +98,22 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
         String title = c.getString(R.string.app_name);
         int color = c.getResources().getColor(R.color.color_primary);
+        Intent offCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
 
         int smallIconResId;
         String contentText;
-        String pauseOrResumeTitle;
         int pauseOrResumeDrawableResId;
+        Intent pauseOrResumeCommand;
 
         if (isPaused()) {
             smallIconResId = R.drawable.ic_shades_off_white;
             contentText = c.getString(R.string.paused);
-            pauseOrResumeTitle = c.getString(R.string.action_start);
             pauseOrResumeDrawableResId = R.drawable.ic_play_arrow;
+            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_PAUSE);
         } else {
             smallIconResId = R.drawable.ic_shades_on_white;
             contentText = c.getString(R.string.running);
-            pauseOrResumeTitle = c.getString(R.string.action_pause);
             pauseOrResumeDrawableResId = R.drawable.ic_pause;
-        }
-
-        Intent offCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
-        Intent pauseOrResumeCommand;
-        if (isPaused()) {
-            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_PAUSE);
-        } else {
             pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
         }
 
@@ -133,8 +126,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
                             .setContentTitle(title)
                             .setContentText(contentText)
                             .setColor(color)
-                            .addAction(R.drawable.ic_stop, c.getString(R.string.action_stop), stopPI)
-                            .addAction(pauseOrResumeDrawableResId, pauseOrResumeTitle, pauseOrResumePI)
+                            .addAction(R.drawable.ic_stop, null, stopPI)
+                            .addAction(pauseOrResumeDrawableResId, null, pauseOrResumePI)
                             .setPriority(Notification.PRIORITY_MIN);
 
         mServiceController.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
