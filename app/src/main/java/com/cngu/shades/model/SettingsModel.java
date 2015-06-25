@@ -52,12 +52,16 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
         return mSharedPreferences.getBoolean(mPowerStatePrefKey, false);
     }
 
+    public void setShadesPowerState(boolean state) {
+        mSharedPreferences.edit().putBoolean(mPowerStatePrefKey, state).apply();
+    }
+
     public boolean getShadesPauseState() {
         return mSharedPreferences.getBoolean(mPauseStatePrefKey, false);
     }
 
-    public void setShadesPowerState(boolean state) {
-        mSharedPreferences.edit().putBoolean(mPowerStatePrefKey, state).apply();
+    public void setShadesPauseState(boolean state) {
+        mSharedPreferences.edit().putBoolean(mPauseStatePrefKey, state).apply();
     }
 
     public int getShadesDimLevel() {

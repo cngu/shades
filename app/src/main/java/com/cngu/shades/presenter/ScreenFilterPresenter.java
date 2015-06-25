@@ -7,6 +7,7 @@ import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
 
 import com.cngu.shades.helper.AbstractAnimatorListener;
 import com.cngu.shades.helper.FilterCommandParser;
@@ -23,7 +24,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private static final String TAG = "ScreenFilterPresenter";
     private static final boolean DEBUG = true;
 
-    private static final int FADE_DURATION_MS = 3000;
+    private static final int FADE_DURATION_MS = 1000;
 
     private ScreenFilterView mView;
     private SettingsModel mSettingsModel;
@@ -90,6 +91,10 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     @Override
     public void onShadesDimLevelChanged(int dimLevel) {
+        if (isPaused()) {
+            return;
+        }
+
         if (mDimAnimator.isRunning()) {
             mDimAnimator.cancel();
         }
@@ -98,7 +103,15 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     @Override
     public void onShadesColorChanged(int color) {
+        if (isPaused()) {
+            return;
+        }
+
         animateShadesColor(color);
+    }
+
+    private boolean isPaused() {
+        return mCurrentState == mPauseState;
     }
 
     private void animateShadesColor(int toColor) {

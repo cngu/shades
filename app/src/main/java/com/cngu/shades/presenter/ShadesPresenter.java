@@ -1,7 +1,6 @@
 package com.cngu.shades.presenter;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;

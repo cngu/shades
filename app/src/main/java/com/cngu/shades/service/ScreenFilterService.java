@@ -1,5 +1,6 @@
 package com.cngu.shades.service;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +8,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.cngu.shades.R;
+import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
@@ -35,6 +39,8 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     private SettingsModel mSettingsModel;
     private SharedPreferences mSharedPreferences;
     private OrientationChangeReceiver mOrientationReceiver;
+
+    private boolean mRunningInForeground = false;
 
     @Override
     public void onCreate() {
@@ -68,10 +74,23 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (DEBUG) Log.i(TAG, String.format("onStartCommand(%s, %d, %d", intent, flags, startId));
 
+        if (!mRunningInForeground) {
+            runOnForegroundWithNotification();
+        }
+
         mPresenter.onScreenFilterCommand(intent);
 
         // Do not attempt to restart if the hosting process is killed by Android
         return START_NOT_STICKY;
+    }
+
+    private void runOnForegroundWithNotification() {
+        FilterCommandFactory commandFactory = new FilterCommandFactory(this);
+
+        // TODO: Properly construct this notification
+        startForeground(1, new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher).setContentTitle("TITLE").setContentText("CONTENT").setSubText("SUB").build());
+
+        mRunningInForeground = true;
     }
 
     @Override
