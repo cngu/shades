@@ -85,7 +85,12 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
             return;
         }
 
-        if (key.equals(mDimPrefKey))
+        if (key.equals(mPowerStatePrefKey))
+        {
+            boolean powerState = getShadesPowerState();
+            mSettingsChangedListener.onShadesPowerStateChanged(powerState);
+        }
+        else if (key.equals(mDimPrefKey))
         {
             int dimLevel = getShadesDimLevel();
             mSettingsChangedListener.onShadesDimLevelChanged(dimLevel);
@@ -99,6 +104,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
     //endregion
 
     public interface OnSettingsChangedListener {
+        void onShadesPowerStateChanged(boolean powerState);
         void onShadesDimLevelChanged(int dimLevel);
         void onShadesColorChanged(int color);
     }

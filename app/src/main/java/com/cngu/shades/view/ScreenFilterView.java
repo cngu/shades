@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.view.View;
 
 import com.cngu.shades.preference.ColorPickerPreference;
+import com.cngu.shades.preference.DimSeekBarPreference;
 
 
 public class ScreenFilterView extends View {
@@ -14,11 +15,20 @@ public class ScreenFilterView extends View {
     private static final float MIN_ALPHA = 0x00;
     private static final float MAX_ALPHA = (int) (0xFF * 0.75);
 
-    private int mAlpha = (int) (MAX_ALPHA - MIN_ALPHA)/2;
-    private int mColor = ColorPickerPreference.DEFAULT_VALUE;
+    private int mDimLevel = DimSeekBarPreference.DEFAULT_VALUE;
+    private int mAlpha = dimLevelToAlpha(mDimLevel);
+    private int mRgbColor = ColorPickerPreference.DEFAULT_VALUE;
 
     public ScreenFilterView(Context context) {
         super(context);
+    }
+
+    public int getDimLevel() {
+        return mDimLevel;
+    }
+
+    public int getFilterRgbColor() {
+        return mRgbColor;
     }
 
     /**
@@ -29,7 +39,8 @@ public class ScreenFilterView extends View {
      *                 never be fully opaque.
      */
     public void setFilterDimLevel(int dimLevel) {
-        mAlpha = (int) mapToRange((float) dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
+        mDimLevel = dimLevel;
+        mAlpha = dimLevelToAlpha(dimLevel);
         invalidate();
     }
 
@@ -40,17 +51,21 @@ public class ScreenFilterView extends View {
      *              in {@link android.graphics.Color}, but the alpha byte is ignored.
      */
     public void setFilterRgbColor(int color) {
-        mColor = color;
+        mRgbColor = color;
         invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.argb(mAlpha, Color.red(mColor), Color.green(mColor), Color.blue(mColor)));
+        canvas.drawColor(Color.argb(mAlpha, Color.red(mRgbColor), Color.green(mRgbColor), Color.blue(mRgbColor)));
     }
 
-    private float mapToRange(float value, float minInput, float maxInput,
-                             float minOutput, float maxOutput) {
+    private static int dimLevelToAlpha(int dimLevel) {
+        return (int) mapToRange((float) dimLevel, MIN_DIM, MAX_DIM, MIN_ALPHA, MAX_ALPHA);
+    }
+
+    private static float mapToRange(float value, float minInput, float maxInput,
+                                    float minOutput, float maxOutput) {
         return (value - minInput) * ((maxOutput - minOutput) / (maxInput - minInput)) + minOutput;
     }
 }

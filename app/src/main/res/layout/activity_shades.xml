@@ -31,7 +31,6 @@
         android:layout_marginRight="@dimen/fab_margin_right_bug"
         android:layout_marginBottom="@dimen/fab_margin_bottom_bug"
         android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_shades"
         android:tint="@color/fab_icon_tint"
         app:backgroundTint="@color/fab_background_tint"
         app:fabSize="normal"

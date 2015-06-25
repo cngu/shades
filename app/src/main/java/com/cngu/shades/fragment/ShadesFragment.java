@@ -19,6 +19,7 @@ public class ShadesFragment extends PreferenceFragment {
 
     private ShadesPresenter mPresenter;
     private FloatingActionButton mShadesFab;
+    private int mShadesFabIconResId = -1;
 
     public ShadesFragment() {
         // Android Fragments require an explicit public default constructor for re-creation
@@ -42,6 +43,7 @@ public class ShadesFragment extends PreferenceFragment {
                 mPresenter.onShadesFabClicked();
             }
         });
+        setShadesFabIcon(mShadesFab, mShadesFabIconResId);
 
         // NOTE: Wait until layout to find the padding and x/y locations. For some reason, onStart()
         //       and onResume() both occur before the FAB is measured.
@@ -83,5 +85,16 @@ public class ShadesFragment extends PreferenceFragment {
         mPresenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
+    }
+
+    public void setShadesFabIcon(int drawableResId) {
+        mShadesFabIconResId = drawableResId;
+        setShadesFabIcon(mShadesFab, mShadesFabIconResId);
+    }
+
+    private void setShadesFabIcon(FloatingActionButton fab, int drawableResId) {
+        if (fab != null && drawableResId != -1) {
+            fab.setImageResource(drawableResId);
+        }
     }
 }

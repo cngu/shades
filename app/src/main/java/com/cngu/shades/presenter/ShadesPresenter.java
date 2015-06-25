@@ -1,7 +1,9 @@
 package com.cngu.shades.presenter;
 
 import android.content.Intent;
+import android.util.Log;
 
+import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
 import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandSender;
@@ -16,6 +18,8 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     private SettingsModel mSettingsModel;
     private FilterCommandFactory mFilterCommandFactory;
     private FilterCommandSender mFilterCommandSender;
+
+    private boolean mSendingCommand = false;
 
     public ShadesPresenter(ShadesFragment view, SettingsModel settingsModel,
                            FilterCommandFactory filterCommandFactory,
@@ -35,26 +39,38 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
         mFilterCommandFactory = filterCommandFactory;
         mFilterCommandSender = filterCommandSender;
 
-        initializeShadesFabIcon();
+        boolean powerState = mSettingsModel.getShadesPowerState();
+        setShadesFabIcon(powerState);
     }
 
-    private void initializeShadesFabIcon() {
-        
+    private void setShadesFabIcon(boolean powerState) {
+        int iconResId = powerState ? R.drawable.ic_brightness : R.drawable.ic_shades;
+        mView.setShadesFabIcon(iconResId);
     }
 
     public void onShadesFabClicked() {
-        Intent command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
+        if (mSendingCommand) {
+            return;
+        }
 
+        mSendingCommand = true;
+
+        Intent command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
         mFilterCommandSender.send(command);
     }
 
+    //region OnSettingsChangedListener
     @Override
-    public void onShadesDimLevelChanged(int dimLevel) {
+    public void onShadesPowerStateChanged(boolean powerState) {
+        setShadesFabIcon(powerState);
 
+        mSendingCommand = false;
     }
 
     @Override
-    public void onShadesColorChanged(int color) {
+    public void onShadesDimLevelChanged(int dimLevel) {/* do nothing */}
 
-    }
+    @Override
+    public void onShadesColorChanged(int color) {/* do nothing */}
+    //endregion
 }

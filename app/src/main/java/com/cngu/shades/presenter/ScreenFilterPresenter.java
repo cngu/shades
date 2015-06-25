@@ -1,6 +1,10 @@
 package com.cngu.shades.presenter;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.Gravity;
@@ -76,6 +80,9 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     //region OnSettingsChangedListener
     @Override
+    public void onShadesPowerStateChanged(boolean powerState) {/* do nothing */}
+
+    @Override
     public void onShadesDimLevelChanged(int dimLevel) {
         mView.setFilterDimLevel(dimLevel);
     }
@@ -120,6 +127,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         if (!mScreenFilterOpen) {
             mWindowViewManager.openWindow(mView, createFilterLayoutParams());
             mScreenFilterOpen = true;
+
             mSettingsModel.setShadesPowerState(true);
         }
     }
@@ -134,6 +142,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         if (mScreenFilterOpen) {
             mWindowViewManager.closeWindow(mView);
             mScreenFilterOpen = false;
+
             mSettingsModel.setShadesPowerState(false);
         }
     }
