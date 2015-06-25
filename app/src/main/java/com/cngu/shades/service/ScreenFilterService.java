@@ -42,7 +42,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
 
         if (DEBUG) Log.i(TAG, "onCreate");
 
-        // Wire View and Presenter
+        // Initialize helpers and managers
         Context context = this;
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
@@ -51,13 +51,17 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
         ScreenManager sm = new ScreenManager(this, windowManager);
         FilterCommandParser fcp = new FilterCommandParser();
 
+        // Wire MVP classes
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSettingsModel = new SettingsModel(context.getResources(), mSharedPreferences);
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(mSettingsModel);
 
         mPresenter = new ScreenFilterPresenter(view, mSettingsModel, this, wvm, sm, fcp);
 
-        registerOrientationReceiver();
+        // Make Presenter listen to settings changes and orientation changes
+        mSettingsModel.openSettingsChangeListener();
+        mSettingsModel.setOnSettingsChangedListener(mPresenter);
+
+        registerOrientationReceiver(mPresenter);
     }
 
     @Override
@@ -80,7 +84,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     public void onDestroy() {
         if (DEBUG) Log.i(TAG, "onDestroy");
 
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(mSettingsModel);
+        mSettingsModel.closeSettingsChangeListener();
         unregisterOrientationReceiver();
 
         super.onDestroy();
@@ -92,7 +96,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
         stopSelf();
     }
 
-    private void registerOrientationReceiver() {
+    private void registerOrientationReceiver(OrientationChangeReceiver.OnOrientationChangeListener listener) {
         if (mOrientationReceiver != null) {
             return;
         }
@@ -100,7 +104,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
         IntentFilter orientationIntentFilter = new IntentFilter();
         orientationIntentFilter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
 
-        mOrientationReceiver = new OrientationChangeReceiver(this, mPresenter);
+        mOrientationReceiver = new OrientationChangeReceiver(this, listener);
         registerReceiver(mOrientationReceiver, orientationIntentFilter);
     }
 

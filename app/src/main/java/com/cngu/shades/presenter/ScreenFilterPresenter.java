@@ -63,8 +63,6 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         mWindowViewManager = windowViewManager;
         mScreenManager = screenManager;
         mFilterCommandParser = filterCommandParser;
-
-        mSettingsModel.setOnSettingsChangedListener(this);
     }
 
     public void onScreenFilterCommand(Intent command) {
@@ -84,7 +82,6 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     @Override
     public void onShadesColorChanged(int color) {
-        Log.d(TAG, "SHADES COLOR CHANGED: " + color);
         mView.setFilterRgbColor(color);
     }
     //endregion

@@ -1,7 +1,9 @@
 package com.cngu.shades.activity;
 
 import android.app.FragmentManager;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -9,6 +11,7 @@ import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
 import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandSender;
+import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.presenter.ShadesPresenter;
 
 public class ShadesActivity extends AppCompatActivity {
@@ -16,7 +19,9 @@ public class ShadesActivity extends AppCompatActivity {
     private static final boolean DEBUG = true;
     private static final String FRAGMENT_TAG_SHADES = "cngu.fragment.tag.SHADES";
 
+    private SharedPreferences mSharedPreferences;
     private ShadesPresenter mPresenter;
+    private SettingsModel mSettingsModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +48,28 @@ public class ShadesActivity extends AppCompatActivity {
             view = (ShadesFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_SHADES);
         }
 
-        // Connect MVP View and Presenter
+        // Wire MVP classes
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSettingsModel = new SettingsModel(getResources(), mSharedPreferences);
         FilterCommandFactory filterCommandFactory = new FilterCommandFactory(this);
         FilterCommandSender filterCommandSender = new FilterCommandSender(this);
-        mPresenter = new ShadesPresenter(view, filterCommandFactory, filterCommandSender);
+
+        mPresenter = new ShadesPresenter(view, mSettingsModel, filterCommandFactory, filterCommandSender);
+        view.registerPresenter(mPresenter);
+
+        // Make Presenter listen to settings changes
+        mSettingsModel.setOnSettingsChangedListener(mPresenter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mSettingsModel.openSettingsChangeListener();
+    }
+
+    @Override
+    protected void onStop() {
+        mSettingsModel.closeSettingsChangeListener();
+        super.onStop();
     }
 }

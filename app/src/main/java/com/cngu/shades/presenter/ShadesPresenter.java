@@ -1,22 +1,24 @@
 package com.cngu.shades.presenter;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.cngu.shades.fragment.ShadesFragment;
 import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandSender;
+import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.service.ScreenFilterService;
 
-public class ShadesPresenter {
+public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener {
     private static final String TAG = "ShadesPresenter";
     private static final boolean DEBUG = true;
 
     private ShadesFragment mView;
+    private SettingsModel mSettingsModel;
     private FilterCommandFactory mFilterCommandFactory;
     private FilterCommandSender mFilterCommandSender;
 
-    public ShadesPresenter(ShadesFragment view, FilterCommandFactory filterCommandFactory,
+    public ShadesPresenter(ShadesFragment view, SettingsModel settingsModel,
+                           FilterCommandFactory filterCommandFactory,
                            FilterCommandSender filterCommandSender) {
         if (view == null) {
             throw new IllegalArgumentException("view cannot be null");
@@ -29,17 +31,30 @@ public class ShadesPresenter {
         }
 
         mView = view;
+        mSettingsModel = settingsModel;
         mFilterCommandFactory = filterCommandFactory;
         mFilterCommandSender = filterCommandSender;
 
-        mView.registerPresenter(this);
+        initializeShadesFabIcon();
+    }
 
-        if (DEBUG) Log.i(TAG, "Registered View");
+    private void initializeShadesFabIcon() {
+        
     }
 
     public void onShadesFabClicked() {
         Intent command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
 
         mFilterCommandSender.send(command);
+    }
+
+    @Override
+    public void onShadesDimLevelChanged(int dimLevel) {
+
+    }
+
+    @Override
+    public void onShadesColorChanged(int color) {
+
     }
 }

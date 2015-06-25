@@ -2,12 +2,27 @@ package com.cngu.shades.model;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.cngu.shades.R;
 import com.cngu.shades.preference.ColorPickerPreference;
 import com.cngu.shades.preference.DimSeekBarPreference;
 
+/**
+ * This class provides access to get and set Shades settings, and also listen to settings changes.
+ *
+ * <p>In order to listen to settings changes, invoke
+ * {@link SettingsModel#setOnSettingsChangedListener(OnSettingsChangedListener)} and
+ * {@link SettingsModel#openSettingsChangeListener()}.
+ *
+ * <p><b>You must call {@link SettingsModel#closeSettingsChangeListener()} when you are done
+ * listening to changes.</b>
+ *
+ * <p>To begin listening again, invoke {@link SettingsModel#openSettingsChangeListener()}.
+ */
 public class SettingsModel implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private static final String TAG = "SettingsModel";
+    private static final boolean DEBUG = true;
 
     private SharedPreferences mSharedPreferences;
     private OnSettingsChangedListener mSettingsChangedListener;
@@ -47,6 +62,23 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
         return mSharedPreferences.getInt(mColorPrefKey, ColorPickerPreference.DEFAULT_VALUE);
     }
 
+    public void setOnSettingsChangedListener(OnSettingsChangedListener listener) {
+        mSettingsChangedListener = listener;
+    }
+
+    public void openSettingsChangeListener() {
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        if (DEBUG) Log.d(TAG, "Opened Settings change listener");
+    }
+
+    public void closeSettingsChangeListener() {
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+
+        if (DEBUG) Log.d(TAG, "Closed Settings change listener");
+    }
+
+    //region OnSharedPreferenceChangeListener
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (mSettingsChangedListener == null) {
@@ -64,10 +96,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
             mSettingsChangedListener.onShadesColorChanged(color);
         }
     }
-
-    public void setOnSettingsChangedListener(OnSettingsChangedListener listener) {
-        mSettingsChangedListener = listener;
-    }
+    //endregion
 
     public interface OnSettingsChangedListener {
         void onShadesDimLevelChanged(int dimLevel);
