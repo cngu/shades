@@ -2,14 +2,21 @@ package com.cngu.shades.presenter;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
 
+import com.cngu.shades.R;
 import com.cngu.shades.helper.AbstractAnimatorListener;
+import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
 import com.cngu.shades.manager.WindowViewManager;
@@ -24,6 +31,10 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private static final String TAG = "ScreenFilterPresenter";
     private static final boolean DEBUG = true;
 
+    private static final int NOTIFICATION_ID = 1;
+    private static final int REQUEST_CODE_ACTION_STOP_ID = 1000;
+    private static final int REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID = 2000;
+
     private static final int FADE_DURATION_MS = 1000;
 
     private ScreenFilterView mView;
@@ -31,6 +42,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private ServiceLifeCycleController mServiceController;
     private WindowViewManager mWindowViewManager;
     private ScreenManager mScreenManager;
+    private NotificationCompat.Builder mNotificationBuilder;
+    private FilterCommandFactory mFilterCommandFactory;
     private FilterCommandParser mFilterCommandParser;
 
     private boolean mScreenFilterOpen = false;
@@ -45,6 +58,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     public ScreenFilterPresenter(ScreenFilterView view, SettingsModel model,
                                  ServiceLifeCycleController serviceController,
                                  WindowViewManager windowViewManager, ScreenManager screenManager,
+                                 NotificationCompat.Builder notificationBuilder,
+                                 FilterCommandFactory filterCommandFactory,
                                  FilterCommandParser filterCommandParser) {
         if (view == null) {
             throw new IllegalArgumentException("view cannot be null");
@@ -70,7 +85,57 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         mServiceController = serviceController;
         mWindowViewManager = windowViewManager;
         mScreenManager = screenManager;
+        mNotificationBuilder = notificationBuilder;
+        mFilterCommandFactory = filterCommandFactory;
         mFilterCommandParser = filterCommandParser;
+    }
+
+    private void refreshForegroundNotification() {
+        Log.d(TAG, "Refreshing foreground notification");
+
+        Context c = mView.getContext();
+
+        String contentText;
+        String subText;
+        String pauseOrResumeTitle;
+        int pauseOrResumeDrawableResId;
+
+        if (isPaused()) {
+            contentText = c.getString(R.string.paused);
+            subText = c.getString(R.string.paused);
+            pauseOrResumeTitle = c.getString(R.string.action_start);
+            pauseOrResumeDrawableResId = R.drawable.ic_play_arrow;
+        } else {
+            contentText = c.getString(R.string.running);
+            subText = c.getString(R.string.running);
+            pauseOrResumeTitle = c.getString(R.string.action_pause);
+            pauseOrResumeDrawableResId = R.drawable.ic_pause;
+        }
+
+        Intent offCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
+        Intent pauseOrResumeCommand;
+        if (isPaused()) {
+            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_PAUSE);
+        } else {
+            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
+        }
+
+        PendingIntent stopPI = PendingIntent.getService(c, REQUEST_CODE_ACTION_STOP_ID,
+                offCommand, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pauseOrResumePI = PendingIntent.getService(c, REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID,
+                pauseOrResumeCommand, PendingIntent.FLAG_ONE_SHOT);
+
+        Bitmap notificationIcon = BitmapFactory.decodeResource(c.getResources(), R.mipmap.ic_launcher);
+        mNotificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                            .setLargeIcon(notificationIcon)
+                            .setContentTitle(c.getString(R.string.app_name))
+                            .setContentText(contentText)
+                            .setSubText(subText)
+                            .addAction(R.drawable.ic_stop, c.getString(R.string.action_stop), stopPI)
+                            .addAction(pauseOrResumeDrawableResId, pauseOrResumeTitle, pauseOrResumePI);
+                            //.setPriority(Notification.PRIORITY_MIN);
+
+        mServiceController.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
     }
 
     public void onScreenFilterCommand(Intent command) {
@@ -234,6 +299,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
         if (mCurrentState == mOffState) {
             mServiceController.stop();
+        } else {
+            refreshForegroundNotification();
         }
     }
 
@@ -249,7 +316,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private class OnState extends State {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
-            if (commandFlag == ScreenFilterService.COMMAND_ON) {
+            if (commandFlag == ScreenFilterService.COMMAND_OFF) {
                 // Only transition to OffState AFTER the screen filter is fully closed
                 closeScreenFilter(new OnScreenFilterClosedListener() {
                     @Override

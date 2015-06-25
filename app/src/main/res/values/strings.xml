@@ -2,7 +2,15 @@
     <!-- App Name and Activity Labels -->
     <string name="app_name">Shades</string>
     <string name="shades_settings">Shades Settings</string>
-    
+
+    <!-- Notification -->
+    <string name="running">Running</string>
+    <string name="paused">Paused</string>
+
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_pause">Pause</string>
+
     <!-- Preference -->
     <string name="pref_title_appearance">Appearance</string>
     <string name="pref_title_startup">Startup</string>

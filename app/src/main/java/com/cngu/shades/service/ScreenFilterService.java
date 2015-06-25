@@ -12,7 +12,6 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.cngu.shades.R;
 import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandParser;
 import com.cngu.shades.manager.ScreenManager;
@@ -27,8 +26,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     public static final int COMMAND_ON = 0;
     public static final int COMMAND_OFF = 1;
     public static final int COMMAND_PAUSE = 2;
-    public static final int COMMAND_RESUME = 3;
-    public static final int VALID_COMMAND_END = 3;
+    public static final int VALID_COMMAND_END = 2;
 
     public static final String BUNDLE_KEY_COMMAND = "cngu.bundle.key.COMMAND";
 
@@ -39,8 +37,6 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     private SettingsModel mSettingsModel;
     private SharedPreferences mSharedPreferences;
     private OrientationChangeReceiver mOrientationReceiver;
-
-    private boolean mRunningInForeground = false;
 
     @Override
     public void onCreate() {
@@ -55,13 +51,15 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
         ScreenFilterView view = new ScreenFilterView(context);
         WindowViewManager wvm = new WindowViewManager(windowManager);
         ScreenManager sm = new ScreenManager(this, windowManager);
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(this);
+        FilterCommandFactory fcf = new FilterCommandFactory(this);
         FilterCommandParser fcp = new FilterCommandParser();
 
         // Wire MVP classes
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSettingsModel = new SettingsModel(context.getResources(), mSharedPreferences);
 
-        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, this, wvm, sm, fcp);
+        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, this, wvm, sm, nb, fcf, fcp);
 
         // Make Presenter listen to settings changes and orientation changes
         mSettingsModel.openSettingsChangeListener();
@@ -74,23 +72,10 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (DEBUG) Log.i(TAG, String.format("onStartCommand(%s, %d, %d", intent, flags, startId));
 
-        if (!mRunningInForeground) {
-            runOnForegroundWithNotification();
-        }
-
         mPresenter.onScreenFilterCommand(intent);
 
         // Do not attempt to restart if the hosting process is killed by Android
         return START_NOT_STICKY;
-    }
-
-    private void runOnForegroundWithNotification() {
-        FilterCommandFactory commandFactory = new FilterCommandFactory(this);
-
-        // TODO: Properly construct this notification
-        startForeground(1, new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher).setContentTitle("TITLE").setContentText("CONTENT").setSubText("SUB").build());
-
-        mRunningInForeground = true;
     }
 
     @Override

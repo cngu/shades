@@ -61,7 +61,13 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
 
         mSendingCommand = true;
 
-        Intent command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
+        Intent command;
+        if (mSettingsModel.getShadesPowerState()) {
+            command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
+        } else {
+            command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
+        }
+
         mFilterCommandSender.send(command);
     }
 
