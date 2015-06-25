@@ -37,7 +37,9 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
         mSettingsModel = settingsModel;
         mFilterCommandFactory = filterCommandFactory;
         mFilterCommandSender = filterCommandSender;
+    }
 
+    public void onStart() {
         boolean poweredOn = mSettingsModel.getShadesPowerState();
         boolean paused = mSettingsModel.getShadesPauseState();
         setShadesFabIcon(poweredOn, paused);

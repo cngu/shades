@@ -65,6 +65,7 @@ public class ShadesActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         mSettingsModel.openSettingsChangeListener();
+        mPresenter.onStart();;
     }
 
     @Override
