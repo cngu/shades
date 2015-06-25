@@ -1,6 +1,7 @@
 package com.cngu.shades.helper;
 
 import android.content.Intent;
+import android.graphics.Point;
 
 import com.cngu.shades.service.ScreenFilterService;
 

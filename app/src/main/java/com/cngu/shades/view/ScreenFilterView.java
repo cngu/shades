@@ -27,10 +27,6 @@ public class ScreenFilterView extends View {
         return mDimLevel;
     }
 
-    public int getFilterRgbColor() {
-        return mRgbColor;
-    }
-
     /**
      * Sets the dim level of the screen filter.
      *

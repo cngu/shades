@@ -23,8 +23,8 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     public static final int COMMAND_ON = 0;
     public static final int COMMAND_OFF = 1;
     public static final int COMMAND_PAUSE = 2;
-    public static final int COMMAND_RESUME = 4;
-    public static final int VALID_COMMAND_END = 4;
+    public static final int COMMAND_RESUME = 3;
+    public static final int VALID_COMMAND_END = 3;
 
     public static final String BUNDLE_KEY_COMMAND = "cngu.bundle.key.COMMAND";
 

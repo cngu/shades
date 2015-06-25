@@ -1,10 +1,6 @@
 package com.cngu.shades.presenter;
 
-import android.animation.Animator;
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.Gravity;
@@ -151,7 +147,6 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         if (newState == null) {
             throw new IllegalArgumentException("newState cannot be null");
         }
-
         if (DEBUG) Log.i(TAG, String.format("Transitioning state from %s to %s", mCurrentState, newState));
 
         mCurrentState = newState;
