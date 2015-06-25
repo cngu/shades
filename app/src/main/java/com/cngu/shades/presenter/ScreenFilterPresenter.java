@@ -86,6 +86,9 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     public void onShadesPowerStateChanged(boolean powerState) {/* do nothing */}
 
     @Override
+    public void onShadesPauseStateChanged(boolean pauseState) {/* do nothing */}
+
+    @Override
     public void onShadesDimLevelChanged(int dimLevel) {
         if (mDimAnimator.isRunning()) {
             mDimAnimator.cancel();

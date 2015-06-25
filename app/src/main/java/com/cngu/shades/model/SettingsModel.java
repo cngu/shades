@@ -28,6 +28,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
     private OnSettingsChangedListener mSettingsChangedListener;
 
     private String mPowerStatePrefKey;
+    private String mPauseStatePrefKey;
     private String mDimPrefKey;
     private String mColorPrefKey;
 
@@ -42,12 +43,17 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
         mSharedPreferences = sharedPreferences;
 
         mPowerStatePrefKey = resources.getString(R.string.pref_key_shades_power_state);
+        mPauseStatePrefKey = resources.getString(R.string.pref_key_shades_pause_state);
         mDimPrefKey = resources.getString(R.string.pref_key_shades_dim_level);
         mColorPrefKey = resources.getString(R.string.pref_key_shades_color);
     }
 
     public boolean getShadesPowerState() {
         return mSharedPreferences.getBoolean(mPowerStatePrefKey, false);
+    }
+
+    public boolean getShadesPauseState() {
+        return mSharedPreferences.getBoolean(mPauseStatePrefKey, false);
     }
 
     public void setShadesPowerState(boolean state) {
@@ -90,6 +96,11 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
             boolean powerState = getShadesPowerState();
             mSettingsChangedListener.onShadesPowerStateChanged(powerState);
         }
+        else if (key.equals(mPauseStatePrefKey))
+        {
+            boolean pauseState = getShadesPauseState();
+            mSettingsChangedListener.onShadesPauseStateChanged(pauseState);
+        }
         else if (key.equals(mDimPrefKey))
         {
             int dimLevel = getShadesDimLevel();
@@ -105,6 +116,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
 
     public interface OnSettingsChangedListener {
         void onShadesPowerStateChanged(boolean powerState);
+        void onShadesPauseStateChanged(boolean pauseState);
         void onShadesDimLevelChanged(int dimLevel);
         void onShadesColorChanged(int color);
     }

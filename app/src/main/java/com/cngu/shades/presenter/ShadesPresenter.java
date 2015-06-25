@@ -39,12 +39,19 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
         mFilterCommandFactory = filterCommandFactory;
         mFilterCommandSender = filterCommandSender;
 
-        boolean powerState = mSettingsModel.getShadesPowerState();
-        setShadesFabIcon(powerState);
+        boolean poweredOn = mSettingsModel.getShadesPowerState();
+        boolean paused = mSettingsModel.getShadesPauseState();
+        setShadesFabIcon(poweredOn, paused);
     }
 
-    private void setShadesFabIcon(boolean powerState) {
-        int iconResId = powerState ? R.drawable.ic_brightness : R.drawable.ic_shades;
+    private void setShadesFabIcon(boolean poweredOn, boolean pauseState) {
+        int iconResId;
+        if (!poweredOn || pauseState) {
+            iconResId = R.drawable.ic_shades;
+        } else {
+            iconResId = R.drawable.ic_brightness;
+        }
+
         mView.setShadesFabIcon(iconResId);
     }
 
@@ -62,9 +69,14 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     //region OnSettingsChangedListener
     @Override
     public void onShadesPowerStateChanged(boolean powerState) {
-        setShadesFabIcon(powerState);
+        setShadesFabIcon(powerState, mSettingsModel.getShadesPauseState());
 
         mSendingCommand = false;
+    }
+
+    @Override
+    public void onShadesPauseStateChanged(boolean pauseState) {
+        setShadesFabIcon(mSettingsModel.getShadesPowerState(), pauseState);
     }
 
     @Override
