@@ -1,6 +1,7 @@
 package com.cngu.shades.presenter;
 
 import android.animation.Animator;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -8,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
@@ -51,6 +51,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private boolean mShuttingDown = false;
     private boolean mScreenFilterOpen = false;
 
+    private ValueAnimator mColorAnimator;
     private ValueAnimator mDimAnimator;
 
     private final State mOnState = new OnState();
@@ -183,13 +184,26 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     }
 
     private void animateShadesColor(int toColor) {
-        mView.setFilterRgbColor(toColor);
+        cancelRunningAnimator(mColorAnimator);
+
+        int fromColor = mView.getFilterRgbColor();
+
+        mColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), fromColor, toColor);
+        mColorAnimator.setDuration(FADE_DURATION_MS);
+        mColorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                mView.setFilterRgbColor((Integer) valueAnimator.getAnimatedValue());
+            }
+        });
+
+        mColorAnimator.start();
     }
 
     private void animateDimLevel(int toDimLevel, Animator.AnimatorListener listener) {
         cancelRunningAnimator(mDimAnimator);
 
-        int fromDimLevel = mView.getDimLevel();
+        int fromDimLevel = mView.getFilterDimLevel();
 
         mDimAnimator = ValueAnimator.ofInt(fromDimLevel, toDimLevel);
         mDimAnimator.setDuration(FADE_DURATION_MS);

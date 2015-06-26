@@ -23,8 +23,12 @@ public class ScreenFilterView extends View {
         super(context);
     }
 
-    public int getDimLevel() {
+    public int getFilterDimLevel() {
         return mDimLevel;
+    }
+
+    public int getFilterRgbColor() {
+        return mRgbColor;
     }
 
     /**
