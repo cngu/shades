@@ -22,8 +22,7 @@ public class FilterCommandFactory {
     /**
      *
      * @param screenFilterServiceCommand one of {@link ScreenFilterService#COMMAND_OFF},
-     *        {@link ScreenFilterService#COMMAND_ON}, {@link ScreenFilterService#COMMAND_PAUSE},
-     *        {@link ScreenFilterService#COMMAND_RESUME}.
+     *        {@link ScreenFilterService#COMMAND_ON}, or {@link ScreenFilterService#COMMAND_PAUSE}.
      * @return an Intent containing a command that can be sent to {@link ScreenFilterService} via
      *         {@link FilterCommandSender#send(Intent)}; null if
      *         {@code screenFilterServiceCommand} is invalid.

@@ -45,13 +45,6 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
 
     public void onShadesFabClicked() {
         Intent command;
-        /*
-        off - not paused = COMMAND ON
-        off - paused = COMMAND ON
-
-        on - not paused = COMMAND OFF
-        on - paused = COMMAND ON
-         */
         if (mSettingsModel.getShadesPowerState() && !mSettingsModel.getShadesPauseState()) {
             command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
         } else {

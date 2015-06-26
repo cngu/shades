@@ -3,6 +3,7 @@ package com.cngu.shades.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.Preference;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
@@ -36,7 +37,7 @@ public class DimSeekBarPreference extends Preference {
     }
 
     @Override
-    protected void onBindView(View view) {
+    protected void onBindView(@NonNull View view) {
         super.onBindView(view);
 
         mDimLevelSeekBar = (SeekBar) view.findViewById(R.id.dim_level_seekbar);

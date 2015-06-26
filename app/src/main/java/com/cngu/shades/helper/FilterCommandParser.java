@@ -16,8 +16,8 @@ public class FilterCommandParser {
      *
      * @param intent that was constructed by {@link FilterCommandFactory}.
      * @return one of {@link ScreenFilterService#COMMAND_OFF}, {@link ScreenFilterService#COMMAND_ON},
-     *         {@link ScreenFilterService#COMMAND_PAUSE}, {@link ScreenFilterService#COMMAND_RESUME},
-     *         or -1 if {@code intent} doesn't contain a valid command.
+     *         {@link ScreenFilterService#COMMAND_PAUSE}, or -1 if {@code intent} doesn't contain a
+     *         valid command.
      */
     public int parseCommandFlag(Intent intent) {
         int errorCode = -1;
