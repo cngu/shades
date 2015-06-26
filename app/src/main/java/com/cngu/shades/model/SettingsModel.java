@@ -2,6 +2,7 @@ package com.cngu.shades.model;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.cngu.shades.R;
@@ -32,14 +33,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
     private String mDimPrefKey;
     private String mColorPrefKey;
 
-    public SettingsModel(Resources resources, SharedPreferences sharedPreferences) {
-        if (resources == null) {
-            throw new IllegalArgumentException("resources cannot be null");
-        }
-        if (sharedPreferences == null) {
-            throw new IllegalArgumentException("sharedPreferences cannot be null");
-        }
-
+    public SettingsModel(@NonNull Resources resources, @NonNull SharedPreferences sharedPreferences) {
         mSharedPreferences = sharedPreferences;
 
         mPowerStatePrefKey = resources.getString(R.string.pref_key_shades_power_state);

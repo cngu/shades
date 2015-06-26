@@ -5,20 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 
 public class OrientationChangeReceiver extends BroadcastReceiver {
 
     private Context mContext;
     private OnOrientationChangeListener mListener;
 
-    public OrientationChangeReceiver(Context context, OnOrientationChangeListener listener) {
-        if (context == null) {
-            throw new IllegalArgumentException("context cannot be null");
-        }
-        if (listener == null) {
-            throw new IllegalArgumentException("listener cannot be null");
-        }
-
+    public OrientationChangeReceiver(@NonNull Context context,
+                                     @NonNull OnOrientationChangeListener listener) {
         mContext = context;
         mListener = listener;
     }

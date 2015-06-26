@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +22,10 @@ public class ColorAdapter extends BaseAdapter {
 
     private Context mContext;
 
-    public ColorAdapter(Context context) {
+    public ColorAdapter(@NonNull Context context) {
         super();
 
-        if (context == null) {
-            throw new IllegalArgumentException("context cannot be null");
-        }
         mContext = context;
-
         mSelectedPosition = -1;
 
         initColorsList(context.getResources());

@@ -3,6 +3,7 @@ package com.cngu.shades.manager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,14 +23,7 @@ public class ScreenManager {
     private int mStatusBarHeight = -1;
     private int mNavigationBarHeight = -1;
 
-    public ScreenManager(Context context, WindowManager windowManager) {
-        if (context == null) {
-            throw new IllegalArgumentException("context cannot be null");
-        }
-        if (windowManager == null) {
-            throw new IllegalArgumentException("windowManager cannot be null");
-        }
-
+    public ScreenManager(@NonNull Context context, @NonNull WindowManager windowManager) {
         mResources = context.getResources();
         mWindowManager = windowManager;
     }

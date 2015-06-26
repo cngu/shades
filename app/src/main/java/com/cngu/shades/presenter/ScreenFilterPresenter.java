@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
@@ -59,32 +60,15 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private final State mPauseState = new PauseState();
     private State mCurrentState = mOffState;
 
-    public ScreenFilterPresenter(ScreenFilterView view, SettingsModel model,
-                                 ServiceLifeCycleController serviceController,
-                                 Context context,
-                                 WindowViewManager windowViewManager, ScreenManager screenManager,
-                                 NotificationCompat.Builder notificationBuilder,
-                                 FilterCommandFactory filterCommandFactory,
-                                 FilterCommandParser filterCommandParser) {
-        if (view == null) {
-            throw new IllegalArgumentException("view cannot be null");
-        }
-        if (model == null) {
-            throw new IllegalArgumentException("model cannot be null");
-        }
-        if (serviceController == null) {
-            throw new IllegalArgumentException("serviceController cannot be null");
-        }
-        if (windowViewManager == null) {
-            throw new IllegalArgumentException("windowViewManager cannot be null");
-        }
-        if (screenManager == null) {
-            throw new IllegalArgumentException("screenManager cannot be null");
-        }
-        if (filterCommandParser == null) {
-            throw new IllegalArgumentException("filterCommandParser cannot be null");
-        }
-
+    public ScreenFilterPresenter(@NonNull ScreenFilterView view,
+                                 @NonNull SettingsModel model,
+                                 @NonNull ServiceLifeCycleController serviceController,
+                                 @NonNull Context context,
+                                 @NonNull WindowViewManager windowViewManager,
+                                 @NonNull ScreenManager screenManager,
+                                 @NonNull NotificationCompat.Builder notificationBuilder,
+                                 @NonNull FilterCommandFactory filterCommandFactory,
+                                 @NonNull FilterCommandParser filterCommandParser) {
         mView = view;
         mSettingsModel = model;
         mServiceController = serviceController;
@@ -291,10 +275,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         mScreenFilterOpen = false;
     }
 
-    private void moveToState(State newState) {
-        if (newState == null) {
-            throw new IllegalArgumentException("newState cannot be null");
-        }
+    private void moveToState(@NonNull State newState) {
         if (DEBUG) Log.i(TAG, String.format("Transitioning state from %s to %s", mCurrentState, newState));
 
         mCurrentState = newState;

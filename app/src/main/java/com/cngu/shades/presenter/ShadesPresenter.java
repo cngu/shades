@@ -1,6 +1,7 @@
 package com.cngu.shades.presenter;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
@@ -18,19 +19,10 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     private FilterCommandFactory mFilterCommandFactory;
     private FilterCommandSender mFilterCommandSender;
 
-    public ShadesPresenter(ShadesFragment view, SettingsModel settingsModel,
-                           FilterCommandFactory filterCommandFactory,
-                           FilterCommandSender filterCommandSender) {
-        if (view == null) {
-            throw new IllegalArgumentException("view cannot be null");
-        }
-        if (filterCommandFactory == null) {
-            throw new IllegalArgumentException("filterCommandFactory cannot be null");
-        }
-        if (filterCommandSender == null) {
-            throw new IllegalArgumentException("filterCommandSender cannot be null");
-        }
-
+    public ShadesPresenter(@NonNull ShadesFragment view,
+                           @NonNull SettingsModel settingsModel,
+                           @NonNull FilterCommandFactory filterCommandFactory,
+                           @NonNull FilterCommandSender filterCommandSender) {
         mView = view;
         mSettingsModel = settingsModel;
         mFilterCommandFactory = filterCommandFactory;

@@ -2,6 +2,7 @@ package com.cngu.shades.fragment;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -86,10 +87,7 @@ public class ShadesFragment extends PreferenceFragment {
         return v;
     }
 
-    public void registerPresenter(ShadesPresenter presenter) {
-        if (presenter == null) {
-            throw new IllegalArgumentException("presenter cannot be null");
-        }
+    public void registerPresenter(@NonNull ShadesPresenter presenter) {
         mPresenter = presenter;
 
         if (DEBUG) Log.i(TAG, "Registered Presenter");
