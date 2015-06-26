@@ -11,7 +11,7 @@ import android.view.WindowManager;
 
 public class ScreenManager {
     private static final String TAG = "ScreenManager";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static final int DEFAULT_NAV_BAR_HEIGHT_DP = 48;
     private static final int DEFAULT_STATUS_BAR_HEIGHT_DP = 25;

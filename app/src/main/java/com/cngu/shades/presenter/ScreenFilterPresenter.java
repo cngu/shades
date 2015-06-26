@@ -6,16 +6,15 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.WindowManager;
 
 import com.cngu.shades.R;
+import com.cngu.shades.activity.ShadesActivity;
 import com.cngu.shades.helper.AbstractAnimatorListener;
 import com.cngu.shades.helper.FilterCommandFactory;
 import com.cngu.shades.helper.FilterCommandParser;
@@ -33,20 +32,23 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private static final boolean DEBUG = true;
 
     private static final int NOTIFICATION_ID = 1;
-    private static final int REQUEST_CODE_ACTION_STOP_ID = 1000;
-    private static final int REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID = 2000;
+    private static final int REQUEST_CODE_ACTION_SETTINGS = 1000;
+    private static final int REQUEST_CODE_ACTION_STOP_ID = 2000;
+    private static final int REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID = 3000;
 
     private static final int FADE_DURATION_MS = 1000;
 
     private ScreenFilterView mView;
     private SettingsModel mSettingsModel;
     private ServiceLifeCycleController mServiceController;
+    private Context mContext;
     private WindowViewManager mWindowViewManager;
     private ScreenManager mScreenManager;
     private NotificationCompat.Builder mNotificationBuilder;
     private FilterCommandFactory mFilterCommandFactory;
     private FilterCommandParser mFilterCommandParser;
 
+    private boolean mShuttingDown = false;
     private boolean mScreenFilterOpen = false;
 
     private ValueAnimator mDimAnimator;
@@ -58,6 +60,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     public ScreenFilterPresenter(ScreenFilterView view, SettingsModel model,
                                  ServiceLifeCycleController serviceController,
+                                 Context context,
                                  WindowViewManager windowViewManager, ScreenManager screenManager,
                                  NotificationCompat.Builder notificationBuilder,
                                  FilterCommandFactory filterCommandFactory,
@@ -84,6 +87,7 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         mView = view;
         mSettingsModel = model;
         mServiceController = serviceController;
+        mContext = context;
         mWindowViewManager = windowViewManager;
         mScreenManager = screenManager;
         mNotificationBuilder = notificationBuilder;
@@ -92,8 +96,6 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     }
 
     private void refreshForegroundNotification() {
-        Log.d(TAG, "Refreshing foreground notification");
-
         Context c = mView.getContext();
 
         String title = c.getString(R.string.app_name);
@@ -106,28 +108,38 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         Intent pauseOrResumeCommand;
 
         if (isPaused()) {
+            Log.d(TAG, "Creating notification while in pause state");
             smallIconResId = R.drawable.ic_shades_off_white;
             contentText = c.getString(R.string.paused);
             pauseOrResumeDrawableResId = R.drawable.ic_play_arrow;
-            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_PAUSE);
+            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
         } else {
+            Log.d(TAG, "Creating notification while NOT in pause state");
             smallIconResId = R.drawable.ic_shades_on_white;
             contentText = c.getString(R.string.running);
             pauseOrResumeDrawableResId = R.drawable.ic_pause;
-            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
+            pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_PAUSE);
         }
 
-        PendingIntent stopPI = PendingIntent.getService(c, REQUEST_CODE_ACTION_STOP_ID,
-                offCommand, PendingIntent.FLAG_ONE_SHOT);
-        PendingIntent pauseOrResumePI = PendingIntent.getService(c, REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID,
-                pauseOrResumeCommand, PendingIntent.FLAG_ONE_SHOT);
+        Intent shadesActivityIntent = new Intent(c, ShadesActivity.class);
+        shadesActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
+        PendingIntent stopPI = PendingIntent.getService(c, REQUEST_CODE_ACTION_STOP_ID,
+                offCommand, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pauseOrResumePI = PendingIntent.getService(c, REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID,
+                pauseOrResumeCommand, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent settingsPI = PendingIntent.getActivity(c, REQUEST_CODE_ACTION_SETTINGS,
+                shadesActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mNotificationBuilder = new NotificationCompat.Builder(mContext);
         mNotificationBuilder.setSmallIcon(smallIconResId)
                             .setContentTitle(title)
                             .setContentText(contentText)
                             .setColor(color)
+                            .setContentIntent(settingsPI)
                             .addAction(R.drawable.ic_stop, null, stopPI)
                             .addAction(pauseOrResumeDrawableResId, null, pauseOrResumePI)
+                            .addAction(R.drawable.ic_settings, null, settingsPI)
                             .setPriority(Notification.PRIORITY_MIN);
 
         mServiceController.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
@@ -135,6 +147,11 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     public void onScreenFilterCommand(Intent command) {
         int commandFlag = mFilterCommandParser.parseCommandFlag(command);
+
+        if (mShuttingDown) {
+            Log.i(TAG, "In the process of shutting down; ignoring command: " + commandFlag);
+            return;
+        }
 
         if (DEBUG) Log.i(TAG, String.format("Handling command: %d in current state: %s",
                 commandFlag, mCurrentState));
@@ -151,27 +168,18 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     @Override
     public void onShadesDimLevelChanged(int dimLevel) {
-        if (isPaused()) {
-            return;
-        }
+        if (!isPaused()) {
+            cancelRunningAnimator(mDimAnimator);
 
-        if (mDimAnimator.isRunning()) {
-            mDimAnimator.cancel();
+            mView.setFilterDimLevel(dimLevel);
         }
-        mView.setFilterDimLevel(dimLevel);
     }
 
     @Override
     public void onShadesColorChanged(int color) {
-        if (isPaused()) {
-            return;
+        if (!isPaused()) {
+            animateShadesColor(color);
         }
-
-        animateShadesColor(color);
-    }
-
-    private boolean isPaused() {
-        return mCurrentState == mPauseState;
     }
 
     private void animateShadesColor(int toColor) {
@@ -179,6 +187,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     }
 
     private void animateDimLevel(int toDimLevel, Animator.AnimatorListener listener) {
+        cancelRunningAnimator(mDimAnimator);
+
         int fromDimLevel = mView.getDimLevel();
 
         mDimAnimator = ValueAnimator.ofInt(fromDimLevel, toDimLevel);
@@ -195,6 +205,20 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         }
 
         mDimAnimator.start();
+    }
+
+    private boolean isOff() {
+        return mCurrentState == mOffState;
+    }
+
+    private boolean isPaused() {
+        return mCurrentState == mPauseState;
+    }
+
+    private void cancelRunningAnimator(Animator animator) {
+        if (animator != null && animator.isRunning()) {
+            animator.cancel();
+        }
     }
     //endregion
 
@@ -229,29 +253,11 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     }
 
     private void openScreenFilter() {
-        if (mScreenFilterOpen) {
-            return;
+        if (!mScreenFilterOpen) {
+            // Display the transparent filter
+            mWindowViewManager.openWindow(mView, createFilterLayoutParams());
+            mScreenFilterOpen = true;
         }
-
-        // Initialize filter to the saved color, but at 0 dim level (0 alpha, i.e. transparent)
-        int fromDim = (int) ScreenFilterView.MIN_DIM;
-        int toDim = mSettingsModel.getShadesDimLevel();
-
-        mView.setFilterDimLevel(fromDim);
-        mView.setFilterRgbColor(mSettingsModel.getShadesColor());
-
-        // Display the transparent filter
-        mWindowViewManager.openWindow(mView, createFilterLayoutParams());
-        mScreenFilterOpen = true;
-
-        // Animate the dim level to the saved value to achieve a fade-in effect
-        animateDimLevel(toDim, new AbstractAnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                // Set power state to ON once the fade-in animation is complete
-                mSettingsModel.setShadesPowerState(true);
-            }
-        });
     }
 
     private void reLayoutScreenFilter() {
@@ -261,27 +267,14 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         mWindowViewManager.reLayoutWindow(mView, createFilterLayoutParams());
     }
 
-    private void closeScreenFilter(final OnScreenFilterClosedListener listener) {
+    private void closeScreenFilter() {
         if (!mScreenFilterOpen) {
             return;
         }
 
-        // Animate the dim level out to achieve a fade-out effect
-        animateDimLevel((int) ScreenFilterView.MIN_DIM, new AbstractAnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                // Close the window once the fade-out animation is complete
-                mWindowViewManager.closeWindow(mView);
-                mScreenFilterOpen = false;
-
-                // Set power state to OFF once the fade-out animation is complete
-                mSettingsModel.setShadesPowerState(false);
-
-                if (listener != null) {
-                    listener.onClosed();
-                }
-            }
-        });
+        // Close the window once the fade-out animation is complete
+        mWindowViewManager.closeWindow(mView);
+        mScreenFilterOpen = false;
     }
 
     private void moveToState(State newState) {
@@ -292,11 +285,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
         mCurrentState = newState;
 
-        if (mCurrentState == mOffState) {
-            mServiceController.stop();
-        } else {
-            refreshForegroundNotification();
-        }
+        mSettingsModel.setShadesPowerState(!isOff());
+        mSettingsModel.setShadesPauseState(isPaused());
     }
 
     private abstract class State {
@@ -311,25 +301,30 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private class OnState extends State {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
-            if (commandFlag == ScreenFilterService.COMMAND_OFF) {
-                // Only transition to OffState AFTER the screen filter is fully closed
-                closeScreenFilter(new OnScreenFilterClosedListener() {
-                    @Override
-                    public void onClosed() {
-                        moveToState(mOffState);
-                    }
-                });
-            }
-        }
-    }
+            switch (commandFlag) {
+                case ScreenFilterService.COMMAND_PAUSE:
+                    moveToState(mPauseState);
+                    refreshForegroundNotification();
 
-    private class OffState extends State {
-        @Override
-        protected void onScreenFilterCommand(int commandFlag) {
-            if (commandFlag == ScreenFilterService.COMMAND_ON) {
-                openScreenFilter();
+                    animateDimLevel(ScreenFilterView.MIN_DIM, null);
 
-                moveToState(mOnState);
+                    break;
+
+                case ScreenFilterService.COMMAND_OFF:
+                    mShuttingDown = true;
+
+                    moveToState(mOffState);
+                    mServiceController.stopForeground(true);
+
+                    animateDimLevel(ScreenFilterView.MIN_DIM, new AbstractAnimatorListener() {
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            closeScreenFilter();
+
+                            mServiceController.stop();
+                        }
+                    });
+                    break;
             }
         }
     }
@@ -337,11 +332,62 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     private class PauseState extends State {
         @Override
         protected void onScreenFilterCommand(int commandFlag) {
+            switch (commandFlag) {
+                case ScreenFilterService.COMMAND_ON:
+                    moveToState(mOnState);
+                    refreshForegroundNotification();
 
+                    animateDimLevel(mSettingsModel.getShadesDimLevel(), null);
+
+                    break;
+
+                case ScreenFilterService.COMMAND_OFF:
+                    moveToState(mOffState);
+                    mServiceController.stopForeground(true);
+
+                    closeScreenFilter();
+
+                    break;
+            }
         }
     }
 
-    private interface OnScreenFilterClosedListener {
-        void onClosed();
+    private class OffState extends State {
+        @Override
+        protected void onScreenFilterCommand(int commandFlag) {
+            switch (commandFlag) {
+                case ScreenFilterService.COMMAND_ON:
+                    moveToState(mOnState);
+                    refreshForegroundNotification();
+
+                    int fromDim = ScreenFilterView.MIN_DIM;
+                    int toDim = mSettingsModel.getShadesDimLevel();
+                    int color = mSettingsModel.getShadesColor();
+
+                    mView.setFilterDimLevel(fromDim);
+                    mView.setFilterRgbColor(color);
+
+                    openScreenFilter();
+
+                    animateDimLevel(toDim, null);
+
+                    break;
+
+                case ScreenFilterService.COMMAND_PAUSE:
+                    moveToState(mPauseState);
+                    refreshForegroundNotification();
+
+                    mView.setFilterDimLevel(ScreenFilterView.MIN_DIM);
+
+                    openScreenFilter();
+
+                    break;
+
+                case ScreenFilterService.COMMAND_OFF:
+                    mSettingsModel.setShadesPowerState(false);
+
+                    break;
+            }
+        }
     }
 }

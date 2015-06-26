@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
@@ -59,13 +61,22 @@ public class ShadesActivity extends AppCompatActivity {
 
         // Make Presenter listen to settings changes
         mSettingsModel.setOnSettingsChangedListener(mPresenter);
+
+        findViewById(R.id.debug_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String power = mSettingsModel.getShadesPowerState() ? "true" : "false";
+                String debug = mSettingsModel.getShadesPauseState() ? "true" : "false";
+                Log.d(TAG, String.format("POWER: %s PAUSE: %s", power, debug));
+            }
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mSettingsModel.openSettingsChangeListener();
-        mPresenter.onStart();;
+        mPresenter.onStart();
     }
 
     @Override

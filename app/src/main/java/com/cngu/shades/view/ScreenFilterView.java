@@ -10,7 +10,7 @@ import com.cngu.shades.preference.DimSeekBarPreference;
 
 
 public class ScreenFilterView extends View {
-    public static final float MIN_DIM   = 0f;
+    public static final int MIN_DIM      = 0;
     private static final float MAX_DIM   = 100f;
     private static final float MIN_ALPHA = 0x00;
     private static final float MAX_ALPHA = (int) (0xFF * 0.75);

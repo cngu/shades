@@ -1,6 +1,5 @@
 package com.cngu.shades.service;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +34,6 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
 
     private ScreenFilterPresenter mPresenter;
     private SettingsModel mSettingsModel;
-    private SharedPreferences mSharedPreferences;
     private OrientationChangeReceiver mOrientationReceiver;
 
     @Override
@@ -56,10 +54,10 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
         FilterCommandParser fcp = new FilterCommandParser();
 
         // Wire MVP classes
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mSettingsModel = new SettingsModel(context.getResources(), mSharedPreferences);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSettingsModel = new SettingsModel(context.getResources(), sharedPreferences);
 
-        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, this, wvm, sm, nb, fcf, fcp);
+        mPresenter = new ScreenFilterPresenter(view, mSettingsModel, this, context, wvm, sm, nb, fcf, fcp);
 
         // Make Presenter listen to settings changes and orientation changes
         mSettingsModel.openSettingsChangeListener();
@@ -97,6 +95,7 @@ public class ScreenFilterService extends Service implements ServiceLifeCycleCont
     @Override
     public void stop() {
         if (DEBUG) Log.i(TAG, "Received stop request");
+
         stopSelf();
     }
 

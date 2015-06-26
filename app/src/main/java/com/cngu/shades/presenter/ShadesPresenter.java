@@ -18,8 +18,6 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     private FilterCommandFactory mFilterCommandFactory;
     private FilterCommandSender mFilterCommandSender;
 
-    private boolean mSendingCommand = false;
-
     public ShadesPresenter(ShadesFragment view, SettingsModel settingsModel,
                            FilterCommandFactory filterCommandFactory,
                            FilterCommandSender filterCommandSender) {
@@ -57,14 +55,15 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     }
 
     public void onShadesFabClicked() {
-        if (mSendingCommand) {
-            return;
-        }
-
-        mSendingCommand = true;
-
         Intent command;
-        if (mSettingsModel.getShadesPowerState()) {
+        /*
+        off - not paused = COMMAND ON
+        off - paused = COMMAND ON
+
+        on - not paused = COMMAND OFF
+        on - paused = COMMAND ON
+         */
+        if (mSettingsModel.getShadesPowerState() && !mSettingsModel.getShadesPauseState()) {
             command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
         } else {
             command = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
@@ -77,8 +76,6 @@ public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener 
     @Override
     public void onShadesPowerStateChanged(boolean powerState) {
         setShadesFabIcon(powerState, mSettingsModel.getShadesPauseState());
-
-        mSendingCommand = false;
     }
 
     @Override
