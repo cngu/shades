@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
@@ -20,7 +19,6 @@ public class ShadesActivity extends AppCompatActivity {
     private static final boolean DEBUG = true;
     private static final String FRAGMENT_TAG_SHADES = "cngu.fragment.tag.SHADES";
 
-    private SharedPreferences mSharedPreferences;
     private ShadesPresenter mPresenter;
     private SettingsModel mSettingsModel;
 
@@ -50,8 +48,8 @@ public class ShadesActivity extends AppCompatActivity {
         }
 
         // Wire MVP classes
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mSettingsModel = new SettingsModel(getResources(), mSharedPreferences);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mSettingsModel = new SettingsModel(getResources(), sharedPreferences);
         FilterCommandFactory filterCommandFactory = new FilterCommandFactory(this);
         FilterCommandSender filterCommandSender = new FilterCommandSender(this);
 
@@ -60,20 +58,6 @@ public class ShadesActivity extends AppCompatActivity {
 
         // Make Presenter listen to settings changes
         mSettingsModel.setOnSettingsChangedListener(mPresenter);
-
-        findViewById(R.id.debug_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String power = mSettingsModel.getShadesPowerState() ? "true" : "false";
-                String pause = mSettingsModel.getShadesPauseState() ? "true" : "false";
-                String alwaysStart = mSettingsModel.getOpenOnBootFlag() ? "true" : "false";
-                String resumeAfterReboot = mSettingsModel.getResumeAfterRebootFlag() ? "true" : "false";
-                Log.d(TAG, "POWER: " + power);
-                Log.d(TAG, "PAUSE: " + pause);
-                Log.d(TAG, "ALWAYS_START: " + alwaysStart);
-                Log.d(TAG, "RESUME_AFTER: " + resumeAfterReboot);
-            }
-        });
     }
 
     @Override
