@@ -11,9 +11,6 @@ import com.cngu.shades.model.SettingsModel;
 import com.cngu.shades.service.ScreenFilterService;
 
 public class ShadesPresenter implements SettingsModel.OnSettingsChangedListener {
-    private static final String TAG = "ShadesPresenter";
-    private static final boolean DEBUG = true;
-
     private ShadesFragment mView;
     private SettingsModel mSettingsModel;
     private FilterCommandFactory mFilterCommandFactory;

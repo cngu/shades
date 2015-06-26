@@ -34,7 +34,8 @@ public class ShadesFragment extends PreferenceFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
+                             Bundle savedInstanceState) {
         final View v = super.onCreateView(inflater, container, savedInstanceState);
 
         mShadesFab = (FloatingActionButton) getActivity().findViewById(R.id.shades_fab);
@@ -64,7 +65,8 @@ public class ShadesFragment extends PreferenceFragment {
                     int paddingLeft = prefFragListView.getPaddingLeft();
                     int paddingRight = prefFragListView.getPaddingRight();
                     int paddingBottom = prefFragListView.getPaddingBottom() +
-                            prefFragListView.getBottom() - mShadesFab.getTop();
+                            //prefFragListView.getBottom() - mShadesFab.getTop();
+                            mShadesFab.getBottom() - mShadesFab.getTop() - 20;
 
                     // frameworks/base/core/res/res/layout/preference_list_fragment.xml already
                     // disables clipToPadding for us, but we disable it again in case this changes

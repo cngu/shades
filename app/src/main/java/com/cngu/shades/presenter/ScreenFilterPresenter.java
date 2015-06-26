@@ -34,8 +34,8 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
 
     private static final int NOTIFICATION_ID = 1;
     private static final int REQUEST_CODE_ACTION_SETTINGS = 1000;
-    private static final int REQUEST_CODE_ACTION_STOP_ID = 2000;
-    private static final int REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID = 3000;
+    private static final int REQUEST_CODE_ACTION_STOP = 2000;
+    private static final int REQUEST_CODE_ACTION_PAUSE_OR_RESUME = 3000;
 
     private static final int FADE_DURATION_MS = 1000;
 
@@ -81,10 +81,10 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
     }
 
     private void refreshForegroundNotification() {
-        Context c = mView.getContext();
+        Context context = mView.getContext();
 
-        String title = c.getString(R.string.app_name);
-        int color = c.getResources().getColor(R.color.color_primary);
+        String title = context.getString(R.string.app_name);
+        int color = context.getResources().getColor(R.color.color_primary);
         Intent offCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_OFF);
 
         int smallIconResId;
@@ -95,25 +95,27 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
         if (isPaused()) {
             Log.d(TAG, "Creating notification while in pause state");
             smallIconResId = R.drawable.ic_shades_off_white;
-            contentText = c.getString(R.string.paused);
+            contentText = context.getString(R.string.paused);
             pauseOrResumeDrawableResId = R.drawable.ic_play_arrow;
             pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_ON);
         } else {
             Log.d(TAG, "Creating notification while NOT in pause state");
             smallIconResId = R.drawable.ic_shades_on_white;
-            contentText = c.getString(R.string.running);
+            contentText = context.getString(R.string.running);
             pauseOrResumeDrawableResId = R.drawable.ic_pause;
             pauseOrResumeCommand = mFilterCommandFactory.createCommand(ScreenFilterService.COMMAND_PAUSE);
         }
 
-        Intent shadesActivityIntent = new Intent(c, ShadesActivity.class);
+        Intent shadesActivityIntent = new Intent(context, ShadesActivity.class);
         shadesActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent stopPI = PendingIntent.getService(c, REQUEST_CODE_ACTION_STOP_ID,
-                offCommand, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pauseOrResumePI = PendingIntent.getService(c, REQUEST_CODE_ACTION_PAUSE_OR_RESUME_ID,
+        PendingIntent stopPI = PendingIntent.getService(context,
+                REQUEST_CODE_ACTION_STOP, offCommand, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent pauseOrResumePI = PendingIntent.getService(context, REQUEST_CODE_ACTION_PAUSE_OR_RESUME,
                 pauseOrResumeCommand, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent settingsPI = PendingIntent.getActivity(c, REQUEST_CODE_ACTION_SETTINGS,
+
+        PendingIntent settingsPI = PendingIntent.getActivity(context, REQUEST_CODE_ACTION_SETTINGS,
                 shadesActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mNotificationBuilder = new NotificationCompat.Builder(mContext);
@@ -122,9 +124,9 @@ public class ScreenFilterPresenter implements OrientationChangeReceiver.OnOrient
                             .setContentText(contentText)
                             .setColor(color)
                             .setContentIntent(settingsPI)
-                            .addAction(R.drawable.ic_stop, null, stopPI)
-                            .addAction(pauseOrResumeDrawableResId, null, pauseOrResumePI)
-                            .addAction(R.drawable.ic_settings, null, settingsPI)
+                            .addAction(R.drawable.ic_stop, "", stopPI)
+                            .addAction(pauseOrResumeDrawableResId, "", pauseOrResumePI)
+                            .addAction(R.drawable.ic_settings, "", settingsPI)
                             .setPriority(Notification.PRIORITY_MIN);
 
         mServiceController.startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
