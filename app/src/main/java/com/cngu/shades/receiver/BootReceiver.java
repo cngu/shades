@@ -36,12 +36,12 @@ public class BootReceiver extends BroadcastReceiver {
         if (alwaysOpenOnBoot) {
             if (DEBUG) Log.i(TAG, "\"Always open on startup\" flag was set; starting now.");
 
-            commandSender.send(pausedBeforeReboot ? pauseCommand : onCommand);
+            commandSender.send(onCommand);
             return;
         }
 
         // Handle "Keep running after reboot" flag
-        boolean resumeAfterReboot = settingsModel.getKeepRunningAfterRebootFlag();
+        boolean resumeAfterReboot = settingsModel.getResumeAfterRebootFlag();
         if (resumeAfterReboot) {
             if (DEBUG) Log.i(TAG, "\"Keep running after reboot\" flag was set.");
 

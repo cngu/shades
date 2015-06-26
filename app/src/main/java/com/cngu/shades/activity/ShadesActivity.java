@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import com.cngu.shades.R;
 import com.cngu.shades.fragment.ShadesFragment;
@@ -66,8 +65,13 @@ public class ShadesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String power = mSettingsModel.getShadesPowerState() ? "true" : "false";
-                String debug = mSettingsModel.getShadesPauseState() ? "true" : "false";
-                Log.d(TAG, String.format("POWER: %s PAUSE: %s", power, debug));
+                String pause = mSettingsModel.getShadesPauseState() ? "true" : "false";
+                String alwaysStart = mSettingsModel.getOpenOnBootFlag() ? "true" : "false";
+                String resumeAfterReboot = mSettingsModel.getResumeAfterRebootFlag() ? "true" : "false";
+                Log.d(TAG, "POWER: " + power);
+                Log.d(TAG, "PAUSE: " + pause);
+                Log.d(TAG, "ALWAYS_START: " + alwaysStart);
+                Log.d(TAG, "RESUME_AFTER: " + resumeAfterReboot);
             }
         });
     }

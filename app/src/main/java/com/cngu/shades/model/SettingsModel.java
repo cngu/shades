@@ -74,7 +74,7 @@ public class SettingsModel implements SharedPreferences.OnSharedPreferenceChange
         return mSharedPreferences.getBoolean(mOpenOnBootPrefKey, false);
     }
 
-    public boolean getKeepRunningAfterRebootFlag() {
+    public boolean getResumeAfterRebootFlag() {
         return mSharedPreferences.getBoolean(mKeepRunningAfterRebootPrefKey, false);
     }
 
