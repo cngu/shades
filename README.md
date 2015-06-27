@@ -6,9 +6,10 @@ Shades lets you [put on your figurative sunglasses](http://capcomprotour.com/wp-
 ## Features
 * Opacity setting
 * Color tint setting
-
-## Planned Features
 * Persistent notification when Shades is turned on
   * Notification allows user to open the Shades settings page, or pause or turn off Shades
 * Always open Shades on startup
 * Keep Shades running after reboot
+
+## Planned Features
+* All intended features are complete...for now!
